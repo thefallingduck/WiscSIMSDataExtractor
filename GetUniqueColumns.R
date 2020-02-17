@@ -1,4 +1,4 @@
-GetUniqueColumns <- function(Directory=NA, Isotope){
+GetUniqueColumns <- function(Directory=NA, Isotope=NA){
   
   ####Function to get all unique column names in
   ####a chosen directory from .xls? files.
