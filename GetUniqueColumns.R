@@ -32,7 +32,7 @@ GetUniqueColumns <- function(Directory=NA, Isotope=NA){
     
     }
   
-  FileList <- grep("\\~\\$|@", FileList, value = TRUE, invert = TRUE)
+  FileList <- grep("\\~\\$|@|tuning", FileList, value = TRUE, invert = TRUE)
   
   InputColumns <- vector()
   
