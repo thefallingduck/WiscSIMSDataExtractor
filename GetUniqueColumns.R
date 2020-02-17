@@ -26,8 +26,13 @@ GetUniqueColumns <- function(Directory=NA, Isotope=NA){
   
   FileList <- list.files(path = Directory, pattern = ".xls[x]?", recursive = TRUE, full.names = TRUE)
   
-  FileList <- grep(Isotope, FileList, value = TRUE)
-  FileList <- grep("\\~\\$", FileList, value = TRUE, invert = TRUE)
+    if(is.na(Isotope)==FALSE){
+      
+    FileList <- grep(Isotope, FileList, value = TRUE)
+    
+    }
+  
+  FileList <- grep("\\~\\$|@", FileList, value = TRUE, invert = TRUE)
   
   InputColumns <- vector()
   
