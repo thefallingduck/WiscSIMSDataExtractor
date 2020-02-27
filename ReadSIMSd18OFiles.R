@@ -133,7 +133,7 @@ ExtraColumns <- colnames(Input)[!colnames(Input) %in% UniformColumns]
 MissingColumns <- UniformColumns[!UniformColumns %in% colnames(Input)]
 
 ####If Missing OHO, then just make a blank OHO Column####
-if(MissingColumns)
+#if(MissingColumns)
 ####Stop the program if there are missing required column names####
 ####Return a list of missing column names 
 

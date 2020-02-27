@@ -13,16 +13,27 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   #   ErrorList:  Output character string listing errors encountered with column names
   
   #### For troubleshooting...
-  #InputFile <- file.choose()
-  #PlugNum <- NA
+  InputFile <- file.choose()
+  PlugNum <- NA
   ####Test to see if input file is a proper Excel file with d18O in name ####
   
-  if(grepl("d18O", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
+  if(grepl("d18O|d13C", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
     
     stop('Not valid Excel file')
     
   }
   
+  if(grepl("d18O", InputFile)){
+    
+    IsotopeMethod <- "d18O10"
+    
+  }
+  
+  if(grepl("d13C", InputFile)){
+    
+    IsotopeMethod <- "d13C7"
+    
+  }
   #### Determine if required packages are loaded ####
   
   library(readxl)
@@ -30,120 +41,10 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Input <- as.data.frame(read_excel(InputFile))
   
+  source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/ColumnRename.R")
   ####Replace column names using non-exhaustive list of column names for d18O files based on Spring 2014 file observation####
   
-  for(j in 1:length(colnames(Input))){
-    
-    if(colnames(Input)[j]== c("date", "Date")){
-      
-      colnames(Input)[j] <- "Date"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("time", "Time")){
-      
-      colnames(Input)[j] <- "Time"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("\u03B418O ‰ VSMOW vs UWC-3", "d18O ‰ VSMOW", "d18_VSMOW", "d18O [VSMOW]","d18 VSMOW", "\u03B418O ‰ VSMOW")){
-      
-      colnames(Input)[j] <- "d18OVSMOW"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("2SD (ext.)", "Er (2S)", "2SD", "Std_1SD")){
-      
-      colnames(Input)[j] <- "SD2ext"
-      
-    }
-    
-    
-    if(colnames(Input)[j]%in% c("Mass Bias (‰)", "IMF", "Bias")){
-      
-      colnames(Input)[j] <- "IMF"
-      
-    }
-    
-    
-    if(colnames(Input)[j]%in% c("d18O ‰ raw", "d18O_m", "d18O_meas", "d18_c", "d18O meas", "d18O ‰ measured", "\u03B418O ‰ measured")){
-      
-      colnames(Input)[j] <- "d18Omeas"
-      
-    }
-    
-    
-    if(colnames(Input)[j]%in% c("2SE (int.)", "d18O-2SE", "Er(2S)")){
-      
-      colnames(Input)[j] <- "SE2int"
-      
-    }
-    
-    
-    if(colnames(Input)[j]%in% c("16O (Gcps)", "16O(E9 cps)", "16O     (E9 cps)")){
-      
-      colnames(Input)[j] <- "O16cps"
-      
-    }
-    
-    
-    if(colnames(Input)[j]%in% c("IP(nA)", "IP(nA)  1.7 to 1.9", "IP (nA)")){
-      
-      colnames(Input)[j] <- "IP(nA)"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("Yield (Gcps/nA)", "Yield(E9cps/nA)", "Yield (E9cps/nA)")){
-      
-      colnames(Input)[j] <- "Yield"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("DTFA-X")){
-      
-      colnames(Input)[j] <- "DTFAX"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("DTFA-Y")){
-      
-      colnames(Input)[j] <- "DTFAY"
-      
-    }
-    
-    if(colnames(Input)[j]%in% c("16OH/16O", "16O1H/16O")){
-      
-      colnames(Input)[j] <- "OHO"
-      
-    }
-    
-  }
-  
-  
-  colnames(Input)[2]<-"Comment"  
-  
-  
-  ####List of required column names for the file####
-  #### more of these might be added later
-  
-  UniformColumns <- c("File", "Comment", "d18OVSMOW", "SD2ext", "IMF", "d18Omeas", "SE2int", "O16cps", "IP(nA)", "Yield", "Date", "Time", "X", "Y", "DTFAX", "DTFAY", "Mass", "OHO")
-  
-  ExtraColumns <- colnames(Input)[!colnames(Input) %in% UniformColumns]
-  
-  MissingColumns <- UniformColumns[!UniformColumns %in% colnames(Input)]
-  
-  ####If Missing OHO, then just make a blank OHO Column####
-  #if(MissingColumns)
-  ####Stop the program if there are missing required column names####
-  ####Return a list of missing column names 
-  
-  if(length(MissingColumns)>0){
-    
-    stop(paste("Missing:", toString(MissingColumns)))
-    
-  }
-  
-  Output <- Input[,UniformColumns]
+  Output <- ColumnRename(Input, IsotopeMethod = IsotopeMethod)
   
   Output$INDEX <- 1:nrow(Output)
   
@@ -296,7 +197,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     Output$BRACKET2SD[ReplaceLogic] <- 2*sd(Output$d18Omeas[SelectLogic])
     
-    Meand18O <- mean(Output$d18Omeas[SelectLogic], na.rm=TRUE)
+    Meand18O <- round(mean(Output$d18Omeas[SelectLogic], na.rm=TRUE), digits = 8)
     BracketBias <- (((1+Meand18O/1000)/(1+RunStd/1000))-1)*1000
     
     Output$STDd18O[ReplaceLogic] <- (((1+Output$d18Omeas[ReplaceLogic]/1000)/(1+BracketBias/1000))-1)*1000
@@ -322,34 +223,37 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   Output$STDd18Opdb <- (Output$STDd18O-30.91)/1.03091
   
   Output <- Output[order(Output$INDEX),]
-  Output <- Output[,c("File",
-                      "Comment",
-                      "d18OVSMOW",
-                      "SD2ext",
-                      "IMF",
-                      "d18Omeas",
-                      "SE2int",
-                      "O16cps",
-                      "IP(nA)",
-                      "Yield",
-                      "DATETIME",
-                      "AnalysisLength",
-                      "X",
-                      "Y",
-                      "DTFAX",
-                      "DTFAY",
-                      "Mass",
-                      "OHO",
-                      "MATERIAL",
-                      "GROUPNUM",
-                      "GUESS.SAMP",
-                      "MOUNTNUM",
-                      "UNIQUEGRP",
-                      "REL_YIELD",
-                      "REL_OHO",
-                      "BRACKET2SD",
-                      "STDd18O",
-                      "STDd18Opdb")]
+  
+  plot(Output$INDEX, Output$d18OVSMOW-Output$STDd18O, type = 'o', ylim = c(-.000000001,.000000001))
+  
+  # Output <- Output[,c("File",
+  #                     "Comment",
+  #                     "d18OVSMOW",
+  #                     "SD2ext",
+  #                     "IMF",
+  #                     "d18Omeas",
+  #                     "SE2int",
+  #                     "O16cps",
+  #                     "IP(nA)",
+  #                     "Yield",
+  #                     "DATETIME",
+  #                     "AnalysisLength",
+  #                     "X",
+  #                     "Y",
+  #                     "DTFAX",
+  #                     "DTFAY",
+  #                     "Mass",
+  #                     "OHO",
+  #                     "MATERIAL",
+  #                     "GROUPNUM",
+  #                     "GUESS.SAMP",
+  #                     "MOUNTNUM",
+  #                     "UNIQUEGRP",
+  #                     "REL_YIELD",
+  #                     "REL_OHO",
+  #                     "BRACKET2SD",
+  #                     "STDd18O",
+  #                     "STDd18Opdb")]
   
   return(Output)
   
