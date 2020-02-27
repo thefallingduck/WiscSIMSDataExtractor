@@ -20,7 +20,7 @@ GetUniqueColumns <- function(Directory=NA, Isotope=NA){
   
   if(is.na(Directory)){
     
-    Directory <- choose.dir()
+    Directory <- rstudioapi::selectDirectory()
     
   }
   
