@@ -1,6 +1,6 @@
 GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
-  ####Opens up WiscSIMS datafiles that contain d18O in the
+  ####Opens up WiscSIMS datafiles that contain d18O or d13C in the
   #file name and parses it to a data table with the same column names
   #returns error message if any columns are missing or have not been
   #identified in the initial data set
@@ -14,8 +14,9 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   #### For troubleshooting...
   InputFile <- file.choose()
+  InputFile <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files/20191021_d18O_Helser.xlsx"
   PlugNum <- NA
-  ####Test to see if input file is a proper Excel file with d18O in name ####
+  ####Test to see if input file is a proper Excel file with d18O or d13C in name ####
   
   if(grepl("d18O|d13C", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
     
@@ -42,11 +43,11 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   Input <- as.data.frame(read_excel(InputFile))
   
   source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/ColumnRename.R")
+  source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/StandardID.R")
   ####Replace column names using non-exhaustive list of column names for d18O files based on Spring 2014 file observation####
   
   Output <- ColumnRename(Input, IsotopeMethod = IsotopeMethod)
-  
-  Output$INDEX <- 1:nrow(Output)
+  Output <- Output[order(Output$INDEX),]
   
   #### Identify samples and standards using grepl####
   #### This is a course identification of samples and standards
@@ -58,7 +59,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Output$MATERIAL[is.na(Output$File)==TRUE]<-NA
   
-  Output$MATERIAL[is.na(Output$d18OVSMOW)==FALSE&Output$MATERIAL=='STD']<-'STD?'
+  Output$MATERIAL[!is.na(Output[4])&Output$MATERIAL=='STD']<-'STD?'
   
   #### Identify sample-standard-standard brackets####
   #### This uses Output$MATERIAL column and the spacing of NAs to
@@ -67,7 +68,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Material<-Output$MATERIAL
   
-  # Step one create run of values
+  # Step one create run of values (i.e. sequences with the same "Material" type)
   
   RunIndex <- with(rle(Material), data.frame(number = values,
                                              start = cumsum(lengths) - lengths + 1,
@@ -89,40 +90,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   #### Add GROUPNUM to output dataframe
   
-  Output <- cbind(Output, GROUPNUM)
-  
-  #### Guess at sample mounts ####
-  #### Based on there being a comment
-  #### with no d18Omeas value
-  #### This is actually really bad...
-  #### In the future maybe we can make some standardization here?
-  
-  MountStart <- Output$INDEX[is.na(Output$Comment)==FALSE&is.na(Output$d18Omeas)]
-  
-  MOUNTNUM <- vector(length = nrow(Output))
-  
-  for(i in 2:length(MountStart)){
-    
-    MOUNTNUM[MountStart[i-1]:MountStart[i]] <- i
-    
-  }
-  
-  Output <- cbind(Output, MOUNTNUM)
-  
-  Output$MOUNTNUM <- as.factor(Output$MOUNTNUM)
-  
-  levels(Output$MOUNTNUM) <- Output$Comment[MountStart]
-  
-  #### Analysis Lengths ####
-  Times <- Output[,c("Date","Time","INDEX")]
-  DATETIME <- paste(Times$Date, format(Times$Time, "%H:%M"))
-  DATETIME[DATETIME=="NA NA"] <- NA
-  Output$DATETIME <- as.POSIXct(DATETIME)
-  Times$Time <- as.POSIXct(DATETIME)
-  Times2 <- Times[is.na(Times$Time)==FALSE,]
-  Times2$AnalysisLength <- c(NA, difftime(Times2$Time[-1], Times2$Time[-length(Times2$Time)], units = "mins"))
-  
-  Output <- merge(Output, Times2, by.x="INDEX", by.y = "INDEX", all.x = TRUE, sort = FALSE)
+  Output$GROUPNUM <- GROUPNUM
   
   #### Guess at different samples ####
   #### Based on Levenshtein Distance of comment string
@@ -148,7 +116,9 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
   }else{
     
+    
     GuessPlugs <- length(c(which(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&is.na(Output$MATERIAL)==FALSE]%%2)!=0)))
+    #GuessPlugs <- sum(c(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&!is.na(Output$MATERIAL)])%%2))
     
     df <- data.frame(Comment, GUESS.SAMP = as.factor(cutree(hc,k=GuessPlugs)))
     
@@ -160,28 +130,53 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   #### Bind GUESS.SAMP to Output ####
   
   Output <- merge(Output, df, by.x="Comment", by.y = "Comment", all.x = TRUE, sort = FALSE)
-  
+  Output$GUESS.SAMP <- as.character(Output$GUESS.SAMP)
   Output$GUESS.SAMP[is.na(Output$GUESS.SAMP)==TRUE] <- Output$MATERIAL[is.na(Output$GUESS.SAMP)==TRUE]
+  Output$GUESS.SAMP <- as.factor(Output$GUESS.SAMP)
   
-  #### Relative OHO and Relative Yield ####
+  #### Relative Hydride, Relative Yield, recalc isotope####
   Output$UNIQUEGRP <- as.factor(paste(Output$MATERIAL, Output$GROUPNUM))
   levels(Output$UNIQUEGRP)[levels(Output$UNIQUEGRP)=="NA NA"] <- NA
   Output <- Output[order(Output$GROUPNUM),]
   AllGroups <- unique(as.character(Output$UNIQUEGRP))
   
   Samples <- unique(Output$UNIQUEGRP[Output$MATERIAL=="Sample"& !is.na(Output$MATERIAL)])
+  
   #### Add columns to dataframe
   Output$REL_YIELD <- rep(NA,times=nrow(Output))
-  Output$REL_OHO <- rep(NA,times=nrow(Output))
+  Output$REL_Hyd <- rep(NA,times=nrow(Output))
   Output$BRACKET2SD <- rep(NA,times=nrow(Output))
-  Output$STDd18O <- rep(NA,times=nrow(Output))
+  Output$STDiso <- rep(NA,times=nrow(Output))
   
-  RunStd <- 12.49
+  Output <- StandardID(Output, IsotopeMethod = IsotopeMethod)
   
+  url1 <-
+    "https://github.com/EarthCubeGeochron/Sparrow-WiscSIMS/blob/master/Test-Data/WiscSIMSrunSTDS.xlsx?raw=true"
+  GET(url1, write_disk(tf <- tempfile(fileext = ".xlsx")))
+  
+  Standards <- read_excel(tf)
+  
+  #RunStd <- 12.49
+  
+  #### Choose isotope column from standard table ####
+  if(IsotopeMethod == "d18O10"){
+    
+    Isotope <- "d18O"
+    
+  }
+  
+  if(IsotopeMethod == "d13C7"){
+    
+    Isotope <- "d13C"
+    
+  }
+
+  #### Bracket level recalculation of standard, hydride, and yield####
   for(i in 1:length(Samples)){
     
     StartGroup <- AllGroups[match(Samples[i],AllGroups)-1]
     EndGroup <- AllGroups[match(Samples[i],AllGroups)+1]
+    
     
     if(is.na(EndGroup)){
       
@@ -193,18 +188,20 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     SelectLogic <- Output$UNIQUEGRP==StartGroup & !is.na(Output$UNIQUEGRP)| Output$UNIQUEGRP==EndGroup & !is.na(Output$UNIQUEGRP)
     
+    RunStd <- as.numeric(Standards[Standards$StdName==unique(Output$RegexSTD[SelectLogic]), Isotope])
+    
     Output$GUESS.SAMP[SelectLogic] <- unique(Output$GUESS.SAMP[ReplaceLogic])
     
-    Output$BRACKET2SD[ReplaceLogic] <- 2*sd(Output$d18Omeas[SelectLogic])
+    Output$BRACKET2SD[ReplaceLogic] <- 2*sd(Output[SelectLogic, 7])
     
-    Meand18O <- round(mean(Output$d18Omeas[SelectLogic], na.rm=TRUE), digits = 8)
-    BracketBias <- (((1+Meand18O/1000)/(1+RunStd/1000))-1)*1000
+    MeanIso <- round(mean(Output[SelectLogic, 7], na.rm=TRUE), digits = 8)
+    BracketBias <- (((1+MeanIso/1000)/(1+RunStd/1000))-1)*1000
     
-    Output$STDd18O[ReplaceLogic] <- (((1+Output$d18Omeas[ReplaceLogic]/1000)/(1+BracketBias/1000))-1)*1000
+    Output$STDiso[ReplaceLogic] <- (((1+Output[ReplaceLogic,7]/1000)/(1+BracketBias/1000))-1)*1000
     
     Output$REL_YIELD[ReplaceLogic] <- Output$Yield[ReplaceLogic]/mean(Output$Yield[SelectLogic], na.rm=TRUE)
     
-    Output$REL_OHO[ReplaceLogic] <- Output$OHO[ReplaceLogic]-mean(Output$OHO[SelectLogic], na.rm=TRUE)
+    Output$REL_Hyd[ReplaceLogic] <- Output[ReplaceLogic, 19]-mean(Output[SelectLogic, 19], na.rm=TRUE)
     
   }
   
@@ -220,40 +217,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
   }
   
-  Output$STDd18Opdb <- (Output$STDd18O-30.91)/1.03091
-  
   Output <- Output[order(Output$INDEX),]
-  
-  plot(Output$INDEX, Output$d18OVSMOW-Output$STDd18O, type = 'o', ylim = c(-.000000001,.000000001))
-  
-  # Output <- Output[,c("File",
-  #                     "Comment",
-  #                     "d18OVSMOW",
-  #                     "SD2ext",
-  #                     "IMF",
-  #                     "d18Omeas",
-  #                     "SE2int",
-  #                     "O16cps",
-  #                     "IP(nA)",
-  #                     "Yield",
-  #                     "DATETIME",
-  #                     "AnalysisLength",
-  #                     "X",
-  #                     "Y",
-  #                     "DTFAX",
-  #                     "DTFAY",
-  #                     "Mass",
-  #                     "OHO",
-  #                     "MATERIAL",
-  #                     "GROUPNUM",
-  #                     "GUESS.SAMP",
-  #                     "MOUNTNUM",
-  #                     "UNIQUEGRP",
-  #                     "REL_YIELD",
-  #                     "REL_OHO",
-  #                     "BRACKET2SD",
-  #                     "STDd18O",
-  #                     "STDd18Opdb")]
   
   return(Output)
   

@@ -69,6 +69,21 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   colnames(InputFile) <- StandardColNames
   
   InputFile <- InputFile[, colnames(InputFile) %in% UniformColumns]
+  InputFile$INDEX <- 1:nrow(InputFile)
+  
+  #### Analysis Lengths ####
+  Times <- InputFile[,c("Date","Time","INDEX")]
+  DATETIME <- paste(Times$Date, format(Times$Time, "%H:%M"))
+  DATETIME[DATETIME=="NA NA"] <- NA
+  InputFile$DATETIME <- as.POSIXct(DATETIME)
+  Times$Time <- as.POSIXct(DATETIME)
+  Times2 <- Times[is.na(Times$Time)==FALSE,]
+  Times2$AnalysisLength <- c(NA, difftime(Times2$Time[-1], Times2$Time[-length(Times2$Time)], units = "mins"))
+  
+  InputFile <- merge(InputFile, Times2, by.x="INDEX", by.y = "INDEX", all.x = TRUE, sort = FALSE)
+  
+  InputFile <- InputFile[,!(colnames(InputFile) %in% c("Date.y", "Time.y"))]
+  InputFile <- InputFile[sort(InputFile$INDEX),]
   
   return(InputFile)
   

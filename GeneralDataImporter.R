@@ -32,6 +32,8 @@ WiscSIMSImport <- function(InputFile){
     
   }
   
+  stop("Not valid Isotope extractor")
+  
   return(Output)
   
 }
