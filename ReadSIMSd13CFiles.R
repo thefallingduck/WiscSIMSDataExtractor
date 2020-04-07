@@ -1,6 +1,6 @@
-d18O10SIMSimport <- function(InputFile, PlugNum=NA){
+d13CSIMSimport <- function(InputFile, PlugNum=NA){
   
-####Opens up WiscSIMS datafiles that contain d18O in the
+####Opens up WiscSIMS datafiles that contain d13C in the
   #file name and parses it to a data table with the same column names
   #returns error message if any columns are missing or have not been
   #identified in the initial data set
@@ -15,9 +15,9 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
 #### For troubleshooting...
   #InputFile <- file.choose()
   #PlugNum <- NA
-  ####Test to see if input file is a proper Excel file with d18O in name ####
-
-  if(grepl("d18O", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
+  ####Test to see if input file is a proper Excel file with d13C in name ####
+InputFile <- file.choose()
+  if(grepl("d13C", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
     
     stop('Not valid Excel file')
     
@@ -30,7 +30,7 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
 
   Input <- as.data.frame(read_excel(InputFile))
 
-####Replace column names using non-exhaustive list of column names for d18O files based on Spring 2014 file observation####
+####Replace column names using non-exhaustive list of column names for d13C files based on Spring 2014 file observation####
   
   for(j in 1:length(colnames(Input))){
     
@@ -46,12 +46,12 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
       
     }
 
-    if(colnames(Input)[j]%in% c("\u03B418O ‰ VSMOW vs UWC-3", "d18O ‰ VSMOW", "d18_VSMOW", "d18O [VSMOW]","d18 VSMOW", "\u03B418O ‰ VSMOW")){
+    if(colnames(Input)[j]%in% c("d13C PDB", "\u03B413C ‰ VPDB")){
     
-      colnames(Input)[j] <- "d18OVSMOW"
+      colnames(Input)[j] <- "d13CVPDB"
       
     }
-
+    
     if(colnames(Input)[j]%in% c("2SD (ext.)", "Er (2S)", "2SD", "Std_1SD")){
       
       colnames(Input)[j] <- "SD2ext"
@@ -66,23 +66,23 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
     }
     
 
-    if(colnames(Input)[j]%in% c("d18O ‰ raw", "d18O_m", "d18O_meas", "d18_c", "d18O meas", "d18O ‰ measured", "\u03B418O ‰ measured")){
+    if(colnames(Input)[j]%in% c("13/12_raw", "d13_C", "d13C_m", "\u03B413C ‰ measured")){
       
-      colnames(Input)[j] <- "d18Omeas"
+      colnames(Input)[j] <- "d13Cmeas"
       
     }
     
 
-    if(colnames(Input)[j]%in% c("2SE (int.)", "d18O-2SE", "Er(2S)")){
+    if(colnames(Input)[j]%in% c("d13C-2SE", "Er(2S)", "2SE (int.)")){
       
       colnames(Input)[j] <- "SE2int"
       
     }
     
 
-    if(colnames(Input)[j]%in% c("16O (Gcps)", "16O(E9 cps)", "16O     (E9 cps)")){
+   if(colnames(Input)[j]%in% c("12C (Mcps)")){
       
-      colnames(Input)[j] <- "O16cps"
+      colnames(Input)[j] <- "C12cps"
       
     }
     
@@ -93,9 +93,16 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
       
     }
 
-    if(colnames(Input)[j]%in% c("Yield (Gcps/nA)", "Yield(E9cps/nA)", "Yield (E9cps/nA)")){
+    if(colnames(Input)[j]%in% c("Yield 10MHz/nA")){
       
-      colnames(Input)[j] <- "Yield"
+      colnames(Input)[j] <- "Yield_Mcps/nA"
+      Input$`Yield_1MHz/nA` <- Input$`Yield_1MHz/nA`*10
+      
+    }
+    
+    if(colnames(Input)[j]%in% c("Yield 1MHz/nA", "Yield (Mcps/nA)")){
+      
+      colnames(Input)[j] <- "Yield_Mcps/nA"
       
     }
 
@@ -111,9 +118,9 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
       
     }
     
-    if(colnames(Input)[j]%in% c("16OH/16O", "16O1H/16O")){
+    if(colnames(Input)[j]%in% c("13CH/13C")){
       
-      colnames(Input)[j] <- "OHO"
+      colnames(Input)[j] <- "CHC"
       
     }
     
@@ -121,19 +128,23 @@ d18O10SIMSimport <- function(InputFile, PlugNum=NA){
 
   
 colnames(Input)[2]<-"Comment"  
-
+colnames(Input)[1]<-"File"
 
 ####List of required column names for the file####
 #### more of these might be added later
 
-UniformColumns <- c("File", "Comment", "d18OVSMOW", "SD2ext", "IMF", "d18Omeas", "SE2int", "O16cps", "IP(nA)", "Yield", "Date", "Time", "X", "Y", "DTFAX", "DTFAY", "Mass", "OHO")
+UniformColumns <- c("File", "Comment", "d13CVPDB", "SD2ext", "IMF", "d13Cmeas", "SE2int", "C12cps", "IP(nA)", "Yield_Mcps/nA", "Date", "Time", "X", "Y", "DTFAX", "DTFAY", "Mass", "CHC")
 
 ExtraColumns <- colnames(Input)[!colnames(Input) %in% UniformColumns]
 
 MissingColumns <- UniformColumns[!UniformColumns %in% colnames(Input)]
 
-####If Missing OHO, then just make a blank OHO Column####
-#if(MissingColumns)
+####If Missing CHC, then just make a blank CHC Column####
+if(grep('CHC', MissingColumns)>0){
+  
+  Input$CHC <- rep(NA, nrow(Input))
+  
+}
 ####Stop the program if there are missing required column names####
 ####Return a list of missing column names 
 
@@ -157,7 +168,7 @@ Output$MATERIAL <- ifelse(grepl("UW|WI|KIM|SC", Output$Comment, ignore.case = TR
 
 Output$MATERIAL[is.na(Output$File)==TRUE]<-NA
 
-Output$MATERIAL[is.na(Output$d18OVSMOW)==FALSE&Output$MATERIAL=='STD']<-'STD?'
+Output$MATERIAL[is.na(Output$d13CVPDB)==FALSE&Output$MATERIAL=='STD']<-'STD?'
 
 #### Identify sample-standard-standard brackets####
 #### This uses Output$MATERIAL column and the spacing of NAs to
@@ -192,11 +203,11 @@ Output <- cbind(Output, GROUPNUM)
 
 #### Guess at sample mounts ####
 #### Based on there being a comment
-#### with no d18Omeas value
+#### with no d13Cmeas value
 #### This is actually really bad...
 #### In the future maybe we can make some standardization here?
 
-MountStart <- Output$INDEX[is.na(Output$Comment)==FALSE&is.na(Output$d18Omeas)]
+MountStart <- Output$INDEX[is.na(Output$Comment)==FALSE&is.na(Output$d13Cmeas)]
 
 MOUNTNUM <- vector(length = nrow(Output))
 
@@ -262,7 +273,7 @@ Output <- merge(Output, df, by.x="Comment", by.y = "Comment", all.x = TRUE, sort
 
 Output$GUESS.SAMP[is.na(Output$GUESS.SAMP)==TRUE] <- Output$MATERIAL[is.na(Output$GUESS.SAMP)==TRUE]
 
-#### Relative OHO and Relative Yield ####
+#### Relative CHC and Relative Yield ####
 Output$UNIQUEGRP <- as.factor(paste(Output$MATERIAL, Output$GROUPNUM))
 levels(Output$UNIQUEGRP)[levels(Output$UNIQUEGRP)=="NA NA"] <- NA
 Output <- Output[order(Output$GROUPNUM),]
@@ -271,14 +282,14 @@ AllGroups <- unique(as.character(Output$UNIQUEGRP))
 Samples <- unique(Output$UNIQUEGRP[Output$MATERIAL=="Sample"& !is.na(Output$MATERIAL)])
 #### Add columns to dataframe
 Output$REL_YIELD <- rep(NA,times=nrow(Output))
-Output$REL_OHO <- rep(NA,times=nrow(Output))
+Output$REL_CHC <- rep(NA,times=nrow(Output))
 Output$BRACKET2SD <- rep(NA,times=nrow(Output))
-Output$STDd18O <- rep(NA,times=nrow(Output))
+Output$STDd13C <- rep(NA,times=nrow(Output))
 
-RunStd <- 12.49
+RunStd <- -0.91
 
 for(i in 1:length(Samples)){
-  
+  i<-1
   StartGroup <- AllGroups[match(Samples[i],AllGroups)-1]
   EndGroup <- AllGroups[match(Samples[i],AllGroups)+1]
   
@@ -294,16 +305,16 @@ for(i in 1:length(Samples)){
   
   Output$GUESS.SAMP[SelectLogic] <- unique(Output$GUESS.SAMP[ReplaceLogic])
 
-  Output$BRACKET2SD[ReplaceLogic] <- 2*sd(Output$d18Omeas[SelectLogic])
+  Output$BRACKET2SD[ReplaceLogic] <- 2*sd(Output$d13Cmeas[SelectLogic])
   
-  Meand18O <- mean(Output$d18Omeas[SelectLogic], na.rm=TRUE)
-  BracketBias <- (((1+Meand18O/1000)/(1+RunStd/1000))-1)*1000
+  Meand13C <- mean(Output$d13Cmeas[SelectLogic], na.rm=TRUE)
+  BracketBias <- (((1+Meand13C/1000)/(1+RunStd/1000))-1)*1000
   
-  Output$STDd18O[ReplaceLogic] <- (((1+Output$d18Omeas[ReplaceLogic]/1000)/(1+BracketBias/1000))-1)*1000
+  Output$STDd13C[ReplaceLogic] <- (((1+Output$d13Cmeas[ReplaceLogic]/1000)/(1+BracketBias/1000))-1)*1000
   
   Output$REL_YIELD[ReplaceLogic] <- Output$Yield[ReplaceLogic]/mean(Output$Yield[SelectLogic], na.rm=TRUE)
   
-  Output$REL_OHO[ReplaceLogic] <- Output$OHO[ReplaceLogic]-mean(Output$OHO[SelectLogic], na.rm=TRUE)
+  Output$REL_CHC[ReplaceLogic] <- Output$CHC[ReplaceLogic]-mean(Output$CHC[SelectLogic], na.rm=TRUE)
 
 }
 
@@ -319,15 +330,13 @@ for(i in 1:nrow(Output[Output$Comment == "average and 2SD"&!is.na(Output$Comment
   
 }
 
-Output$STDd18Opdb <- (Output$STDd18O-30.91)/1.03091
-
 Output <- Output[order(Output$INDEX),]
 Output <- Output[,c("File",
                     "Comment",
-                    "d18OVSMOW",
+                    "d13CVPDB",
                     "SD2ext",
                     "IMF",
-                    "d18Omeas",
+                    "d13Cmeas",
                     "SE2int",
                     "O16cps",
                     "IP(nA)",
@@ -339,17 +348,17 @@ Output <- Output[,c("File",
                     "DTFAX",
                     "DTFAY",
                     "Mass",
-                    "OHO",
+                    "CHC",
                     "MATERIAL",
                     "GROUPNUM",
                     "GUESS.SAMP",
                     "MOUNTNUM",
                     "UNIQUEGRP",
                     "REL_YIELD",
-                    "REL_OHO",
+                    "REL_CHC",
                     "BRACKET2SD",
-                    "STDd18O",
-                    "STDd18Opdb")]
+                    "STDd13C",
+                    "STDd13Cvpdb")]
 
 return(Output)
 

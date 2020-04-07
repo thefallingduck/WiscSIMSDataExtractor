@@ -9,8 +9,11 @@ library(googledrive)
 
   drive_download("WiscSIMS_metadata", type = "csv", overwrite = TRUE)
   
-  DataInput<-read.csv("WiscSIMS_metadata.csv")
+  DataInput<-read.csv("WiscSIMS_metadata.csv", stringsAsFactors = FALSE)
   
+  DataInput$Sample.Location <- strsplit(DataInput$Sample.Location, split = ",")
+  
+  DataInput$SIMS.mount.names <- strsplit(DataInput$SIMS.mount.names, split = ",") 
 
 return(DataInput)  
   
