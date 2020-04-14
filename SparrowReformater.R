@@ -19,6 +19,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
   analysis <- list()
   
   Output <- GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
+  Output <- Output[!is.na(Output$File),]
   
   url1 <-
     "https://github.com/EarthCubeGeochron/Sparrow-WiscSIMS/blob/master/Test-Data/WiscSIMSColumnDictionary.xlsx?raw=true"
