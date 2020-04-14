@@ -13,12 +13,13 @@ DatumNesting <- function(InputFile, PlugNum = NA){
   library(httr)
   library(jsonlite)
   
-  source("~/WiscSIMSDataExtractor/GeneralSIMSImporter.R")
+  source("GeneralSIMSImporter.R")
   
   BaseFile <- basename(InputFile)
   analysis <- list()
   
   Output <- GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
+  Output <- Output[!is.na(Output$File),]
   
   url1 <-
     "https://github.com/EarthCubeGeochron/Sparrow-WiscSIMS/blob/master/Test-Data/WiscSIMSColumnDictionary.xlsx?raw=true"
@@ -27,12 +28,12 @@ DatumNesting <- function(InputFile, PlugNum = NA){
   LookupDF <- read_excel(tf)
   
   #Make nested list for JSON format and Sparrow uploading
-  
+  m<-0
   for(k in 1:length(levels(Output$GUESS.SAMP))){
   
     SampleList <- list()
 
-  for(j in 1:nrow(Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],])){
+  for(j in 1:nrow(Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k]&!is.na(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k]),])){
     
     SampleAnalyses <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
     l <- SampleAnalyses[k]
@@ -44,7 +45,8 @@ DatumNesting <- function(InputFile, PlugNum = NA){
            list(list(value = Output[l,i],
                 type = list(parameter = colnames(Output)[i],
                             unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))))
-    
+    m <- m+1
+    print(m)
   }
   
   analysis <- append(analysis, list(list(analysis_name = IsotopeMethod,
@@ -61,7 +63,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
                          analysis = analysis,
                                              date = Output$DATETIME[1])))
   
-  PUT(url="http://backend:5000/api/v1/import-data/session", body=SampleList, encode = "json")
+  #PUT(url="http://backend:5000/api/v1/import-data/session", body=SampleList, encode = "json")
   
   }
   
