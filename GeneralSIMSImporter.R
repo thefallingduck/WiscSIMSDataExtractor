@@ -13,9 +13,10 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   #   ErrorList:  Output character string listing errors encountered with column names
   
   #### For troubleshooting...
-  InputFile <- file.choose()
+  #InputFile <- file.choose()
   InputFile <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files/20191021_d18O_Helser.xlsx"
   PlugNum <- NA
+  
   ####Test to see if input file is a proper Excel file with d18O or d13C in name ####
   
   if(grepl("d18O|d13C", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
