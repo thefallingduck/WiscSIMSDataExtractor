@@ -14,8 +14,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   #### For troubleshooting...
   #InputFile <- file.choose()
-  InputFile <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files/20191021_d18O_Helser.xlsx"
-  PlugNum <- NA
+  #InputFile <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files/20191021_d18O_Helser.xlsx"
+  #PlugNum <- NA
   
   ####Test to see if input file is a proper Excel file with d18O or d13C in name ####
   
@@ -43,8 +43,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Input <- as.data.frame(read_excel(InputFile))
   
-  source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/ColumnRename.R")
-  source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/StandardID.R")
+  source("ColumnRename.R")
+  source("StandardID.R")
   ####Replace column names using non-exhaustive list of column names for d18O files based on Spring 2014 file observation####
   
   Output <- ColumnRename(Input, IsotopeMethod = IsotopeMethod)
