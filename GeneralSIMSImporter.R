@@ -3,7 +3,10 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   ####Opens up WiscSIMS datafiles that contain d18O or d13C in the
   #file name and parses it to a data table with the same column names
   #returns error message if any columns are missing or have not been
-  #identified in the initial data set
+  #identified in the initial data set. This makes use of several other functions including
+  #ColumnRename.R and StandardID.R which have been made to be flexible using the lookup tables that can be edited.
+  #Eventually these tables will be housed on an instance of Sparrow as part of the database, however
+  #I have not implimented that yet.
   
   #Arguments:
   #   InputFile:  Input excel file chosen by user with WiscSIMS naming convention
@@ -14,8 +17,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   #### For troubleshooting...
   #InputFile <- file.choose()
-  InputFile <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files/20191021_d18O_Helser.xlsx"
-  PlugNum <- NA
+  #InputFile <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files/20191021_d18O_Helser.xlsx"
+  #PlugNum <- NA
   
   ####Test to see if input file is a proper Excel file with d18O or d13C in name ####
   
@@ -43,8 +46,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Input <- as.data.frame(read_excel(InputFile))
   
-  source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/ColumnRename.R")
-  source("/Users/macrostrat/Documents/WiscSIMSDataExtractor/StandardID.R")
+  source("ColumnRename.R")
+  source("StandardID.R")
   ####Replace column names using non-exhaustive list of column names for d18O files based on Spring 2014 file observation####
   
   Output <- ColumnRename(Input, IsotopeMethod = IsotopeMethod)
