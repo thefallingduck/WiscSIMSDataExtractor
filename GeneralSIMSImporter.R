@@ -3,7 +3,10 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   ####Opens up WiscSIMS datafiles that contain d18O or d13C in the
   #file name and parses it to a data table with the same column names
   #returns error message if any columns are missing or have not been
-  #identified in the initial data set
+  #identified in the initial data set. This makes use of several other functions including
+  #ColumnRename.R and StandardID.R which have been made to be flexible using the lookup tables that can be edited.
+  #Eventually these tables will be housed on an instance of Sparrow as part of the database, however
+  #I have not implimented that yet.
   
   #Arguments:
   #   InputFile:  Input excel file chosen by user with WiscSIMS naming convention
