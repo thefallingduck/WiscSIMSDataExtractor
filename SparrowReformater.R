@@ -74,7 +74,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
     }
     
     SampleList <- list(
-      name = BaseFile,
+      name = paste(BaseFile, levels(Output$GUESS.SAMP)[k]),
       date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
       sample = list(name = levels(Output$GUESS.SAMP)[k]),
       analysis = analysis)
