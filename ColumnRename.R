@@ -12,8 +12,8 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   library(httr)
 
 
-  #IsotopeMethod <- "d18O10"
-  #InputFile <- as.data.frame(read_excel(file.choose()))
+  #IsotopeMethod <- "d13C7"
+  #InputFile <- as.data.frame(read_excel(input.file))
   
   ColumnNames <- colnames(InputFile)
   

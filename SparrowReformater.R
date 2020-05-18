@@ -57,13 +57,21 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       l <- SampleAnalyses[k]
       
       DatumList <- list()
+      m <- 1
       for(i in 1:ncol(Output)){
         
-        DatumList <- append(DatumList,
-                            list(list(value = Output[l,i],
-                                      type = list(parameter = colnames(Output)[i],
-                                                  unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))))
-        #m <- m+1
+        Datum <- Output[l,i]
+        
+        if(!is.na(Output[l,i])){
+          
+          DatumList [[m]] <- list(value = Output[l,i],
+                                  type = list(parameter = colnames(Output)[i],
+                                              unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))
+          
+          m <- m+1
+          
+        }
+        
         #print(m)
       }
       
@@ -73,10 +81,10 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       
     }
     
-    SampleList <- list(
-      name = paste(BaseFile, levels(Output$GUESS.SAMP)[k]),
-      date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
+    Session <- list(
+      name = BaseFile,
       sample = list(name = levels(Output$GUESS.SAMP)[k]),
+      date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
       analysis = analysis)
     
     # SampleList <- append(SampleList,
@@ -88,8 +96,8 @@ DatumNesting <- function(InputFile, PlugNum = NA){
     #                                            date = Output$DATETIME[1])))
     
     request <- list(
-      filename=NA,
-      data=SampleList
+      filename=BaseFile,
+      data=Session
     )
     
     PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
