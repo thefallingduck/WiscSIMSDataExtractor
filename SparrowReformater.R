@@ -22,6 +22,8 @@ DatumNesting <- function(InputFile, PlugNum = NA){
   Output <- GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
   Output <- Output[!is.na(Output$File),]
   
+  print(colnames(Output))
+  
   IsotopeMethod <- ""
   
   if(grepl("d18O", InputFile)){
@@ -57,26 +59,40 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       l <- SampleAnalyses[k]
       
       DatumList <- list()
+      m <- 1
       for(i in 1:ncol(Output)){
         
-        DatumList <- append(DatumList,
-                            list(list(value = Output[l,i],
-                                      type = list(parameter = colnames(Output)[i],
-                                                  unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))))
-        #m <- m+1
+        
+        if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
+          
+          if(!is.na(Output[l,i])){
+            value <- Output[l,i]
+          }else{
+            value <- -1042
+          }
+          
+          DatumList [[m]] <- list(value = value,
+                                  type = list(parameter = colnames(Output)[i],
+                                              unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))
+          
+          m <- m+1
+        }
+        
+        
         #print(m)
       }
       
-      analysis <- append(analysis, list(list(analysis_name = IsotopeMethod,
-                                             datum = DatumList,
-                                             session_index = j)))
+      analysis[[j]] <- list(analysis_name = IsotopeMethod,
+                            datum = DatumList,
+                            session_index = j
+      )
       
     }
     
-    SampleList <- list(
-      name = paste(BaseFile, levels(Output$GUESS.SAMP)[k]),
-      date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
+    Session <- list(
+      name = paste(BaseFile, levels(Output$GUESS.SAMP)[k], sep = "_"),
       sample = list(name = levels(Output$GUESS.SAMP)[k]),
+      date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
       analysis = analysis)
     
     # SampleList <- append(SampleList,
@@ -88,16 +104,21 @@ DatumNesting <- function(InputFile, PlugNum = NA){
     #                                            date = Output$DATETIME[1])))
     
     request <- list(
-      filename=NA,
-      data=SampleList
+      filename=paste(BaseFile, k),
+      data=Session
     )
     
-    PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
+    response <- PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
+    
+    errors<-content(response)
+    
+    print(errors)
+    
     
   }
   
   #PUT(url="http://backend:5000/api/v1/import-data/session", body=SampleList, encode = "json")
   
-  return(paste("Sparrow uploaded", BaseFile))
+  return(print("Sparrow upload", BaseFile))
   #return(SampleList)
 }
