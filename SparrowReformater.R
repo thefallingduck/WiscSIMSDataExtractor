@@ -55,7 +55,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
     
     for(j in 1:nrow(Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],])){
       
-      SampleAnalyses <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
+      SampleSubset <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
       l <- SampleAnalyses[k]
       
       DatumList <- list()
@@ -65,8 +65,8 @@ DatumNesting <- function(InputFile, PlugNum = NA){
         
         if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
           
-          if(!is.na(Output[l,i])){
-            value <- Output[l,i]
+          if(!is.na(SampleSubset[l,i])){
+            value <- SampleSubset[l,i]
           }else{
             value <- -1042
           }
