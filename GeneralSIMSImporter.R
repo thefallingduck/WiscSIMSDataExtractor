@@ -193,6 +193,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     SelectLogic <- Output$UNIQUEGRP==StartGroup & !is.na(Output$UNIQUEGRP)| Output$UNIQUEGRP==EndGroup & !is.na(Output$UNIQUEGRP)
     
+    if (length(Output$BRACKET2SD[ReplaceLogic])>=1 && length(Output$BRACKET2SD[SelectLogic])>=1){
+    
     RunStd <- as.numeric(Standards[Standards$StdName==unique(Output$RegexSTD[SelectLogic]), Isotope])
     
     Output$GUESS.SAMP[SelectLogic] <- unique(Output$GUESS.SAMP[ReplaceLogic])
@@ -206,7 +208,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     Output$REL_YIELD[ReplaceLogic] <- Output$Yield[ReplaceLogic]/mean(Output$Yield[SelectLogic], na.rm=TRUE)
     
-    Output$REL_Hyd[ReplaceLogic] <- Output[ReplaceLogic, 19]-mean(Output[SelectLogic, 19], na.rm=TRUE)
+    Output$REL_Hyd[ReplaceLogic] <- Output[ReplaceLogic, 19]-mean(Output[SelectLogic, 19], na.rm=TRUE)}
     
   }
   

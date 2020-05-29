@@ -61,10 +61,11 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
     UniformColumns[!UniformColumns %in% StandardColNames]
   
   
-  if (length(MissingColumns) > 0) {
-    stop(paste("Missing:", toString(MissingColumns)))
-    
-  }
+  tryCatch({
+    if (length(MissingColumns) > 0) {
+      stop(paste("Missing:", toString(MissingColumns)))
+    }
+  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   
   colnames(InputFile) <- StandardColNames
   
