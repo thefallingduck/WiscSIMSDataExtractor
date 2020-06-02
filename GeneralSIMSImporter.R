@@ -123,12 +123,20 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     
     GuessPlugs <- length(c(which(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&is.na(Output$MATERIAL)==FALSE]%%2)!=0)))
-    #GuessPlugs <- sum(c(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&!is.na(Output$MATERIAL)])%%2))
+    
+    if(GuessPlugs>1){
     
     df <- data.frame(Comment, GUESS.SAMP = as.factor(cutree(hc,k=GuessPlugs)))
     
     levels(df$GUESS.SAMP) <- df$Comment[match(levels(df$GUESS.SAMP), df$GUESS.SAMP)]
     
+    }else{
+      
+      df <- data.frame(Comment, GUESS.SAMP = as.factor(rep(Comment[1], times = length(Comment))))
+      
+      levels(df$GUESS.SAMP) <- df$Comment[match(levels(df$GUESS.SAMP), df$GUESS.SAMP)]
+      
+    }
     
   }
   
