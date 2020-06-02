@@ -124,7 +124,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     GuessPlugs <- length(c(which(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&is.na(Output$MATERIAL)==FALSE]%%2)!=0)))
     
-    if(GuessPlugs>1){
+    if(GuessPlugs>2){
     
     df <- data.frame(Comment, GUESS.SAMP = as.factor(cutree(hc,k=GuessPlugs)))
     
