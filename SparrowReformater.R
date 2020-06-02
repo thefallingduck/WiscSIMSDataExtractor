@@ -61,6 +61,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       l <- SampleAnalyses[j]
       
       #Should only upload one sample worth of data at a time
+      #l above should reference to row in Output dataframe.
       
       DatumList <- list()
       m <- 1
