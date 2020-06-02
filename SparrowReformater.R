@@ -56,7 +56,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
     for(j in 1:nrow(Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],])){
       
       SampleSubset <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
-      l <- SampleAnalyses[k]
+      #l <- SampleAnalyses[k]
       
       #Should only upload one sample worth of data at a time
       
