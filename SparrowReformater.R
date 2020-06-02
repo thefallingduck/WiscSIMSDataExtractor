@@ -53,10 +53,12 @@ DatumNesting <- function(InputFile, PlugNum = NA){
     
     SampleList <- list()
     
+    
+    
     for(j in 1:nrow(Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],])){
       
-      SampleSubset <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
-      #l <- SampleAnalyses[k]
+      SampleAnalyses <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
+      l <- SampleAnalyses[j]
       
       #Should only upload one sample worth of data at a time
       
@@ -67,8 +69,8 @@ DatumNesting <- function(InputFile, PlugNum = NA){
         
         if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
           
-          if(!is.na(SampleSubset[l,i])){
-            value <- SampleSubset[l,i]
+          if(!is.na(Output[l,i])){
+            value <- Output[l,i]
           }else{
             value <- -1042
           }
