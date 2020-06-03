@@ -87,8 +87,10 @@ DatumNesting <- function(InputFile, PlugNum = NA){
         #print(m)
       }
       
-      analysis[[j]] <- list(analysis_name = IsotopeMethod,
+      analysis[[j]] <- list(analysis_name = Output$File[l],
+                            analysis_type = IsotopeMethod,
                             datum = DatumList,
+                            material = Output$MATERIAL[l],
                             session_index = j
       )
       
