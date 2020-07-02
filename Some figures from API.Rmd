@@ -11,12 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(jsonlite)
 
-AllData<-fromJSON("http://localhost:5002/api/v1/analysis?all=true", flatten = TRUE)
+#AllData<-fromJSON("http://localhost:5002/api/v1/analysis?all=true", flatten = TRUE)
 
-AllDTFAY <- fromJSON("http://localhost:5002/api/v1/datum?parameter=DTFAY", flatten = TRUE)
+AllDTFAY <- fromJSON("http://wiscsims-data.geoscience.wisc.edu/api/v1/datum?parameter=AnalysisLength", flatten = TRUE)
 
-DTFAYhis <- ggplot(AllDTFAY, aes(x=value))+
-  geom_histogram()+facet_wrap(~sample_name)
+AnalysisLengthHist <- ggplot(AllDTFAY, aes(x=value))+
+  geom_histogram()+facet_wrap(~sample_name)+xlim(0,30)
+
+AnalysisLengthHist
 
 ```
 
@@ -27,7 +29,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-summary(cars)
+
 ```
 
 ## Including Plots

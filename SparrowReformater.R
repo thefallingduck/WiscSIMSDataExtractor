@@ -64,13 +64,14 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       #l above should reference to row in Output dataframe.
       
       DatumList <- list()
+      AttributeList <- list()
       m <- 1
       for(i in 1:ncol(Output)){
         
         
         if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
           
-          if(!is.na(Output[l,i])){
+          if(!is.na(Output[l,i])&is.numeric(Output[l,i])){
             value <- Output[l,i]
           }else{
             value <- -1042
@@ -79,6 +80,20 @@ DatumNesting <- function(InputFile, PlugNum = NA){
           DatumList [[m]] <- list(value = value,
                                   type = list(parameter = colnames(Output)[i],
                                               unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))
+
+          m <- m+1
+        }
+        
+        if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Text"){
+          
+          if(!is.na(Output[l,i])&!is.numeric(Output[l,i])){
+            note <- Output[l,i]
+          }else{
+            note <- "Empty"
+          }
+
+          AttributeList[[m]] <- list(parameter = colnames(Output)[i],
+                                     value = note)
           
           m <- m+1
         }
@@ -90,9 +105,11 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       analysis[[j]] <- list(analysis_name = Output$File[l],
                             analysis_type = IsotopeMethod,
                             datum = DatumList,
+                            attribute = AttributeList,
                             material = Output$MATERIAL[l],
                             session_index = j
       )
+      
       
     }
     
