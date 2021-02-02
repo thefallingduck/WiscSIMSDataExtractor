@@ -1,4 +1,4 @@
-DatumNesting <- function(InputFile, PlugNum = NA){
+DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   
   #### Args:
   #           InputFile:
@@ -132,17 +132,25 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       data=Session
     )
     
+    if(Upload){
+      
     response <- PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
     
     errors<-content(response)
     
     print(errors)
+              
+    }else{
+      NewFile<-gsub("\\..*","",BaseFile)
+      write_json(request, paste("~/Documents/SparrowJSONTest/",NewFile,".json", sep = ""))}
+      
+  
     
     
   }
   
   #PUT(url="http://backend:5000/api/v1/import-data/session", body=SampleList, encode = "json")
   
-  return(print("Sparrow upload", BaseFile))
+  return(print("DONE"))#print("Sparrow upload", BaseFile))
   #return(SampleList)
 }

@@ -63,7 +63,7 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   
   tryCatch({
     if (length(MissingColumns) > 0) {
-      stop(paste("Missing:", toString(MissingColumns)))
+      warning(paste("Missing:", toString(MissingColumns)))
     }
   }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   
