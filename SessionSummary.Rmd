@@ -3,6 +3,9 @@ title: "WiscSIMSLab Session Summary"
 author: "Markdown Document by B.J. Linzmeier"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
+  html_document:
+    df_print: paged
+  word_document: default
   pdf_document: default
 citation_package: biblatex
 biblio-style: chem-acs
@@ -12,7 +15,7 @@ header-includes:
 - \newcommand{\elandscape}{\end{landscape}}
 keep_tex: yes
 link-citations: yes
-bibliography: SIMS Report Refs.bib
+#bibliography: SIMS Report Refs.bib
 always_allow_html: yes
 ---
 
@@ -31,16 +34,16 @@ library(dplyr)
 library(ggExtra)
 library(svDialogs)
 
-Mounts<-dlg_input()$res
-Mounts <- as.numeric(Mounts)
+#Mounts <- 7 #dlg_input()$res
+#Mounts <- as.numeric(Mounts)
 
-source('C:/Users/Ben/Dropbox/SIMS batch data import/SIMS batch data import/ReadSIMSd18OFiles.R', encoding = 'UTF-8')
+source('GeneralSIMSImporter.R')
 
-ExampleFilename <- file.choose() #"C:/Users/Ben/Desktop/20191021_d18O_Helser.xlsx" #file.choose()
+#ExampleFilename <- "/Users/macrostrat/Downloads/20200815_d18O_Leet/20200815_d18O_Leet_finalv2.xlsx" #file.choose() #"C:/Users/Ben/Desktop/20191021_d18O_Helser.xlsx" #file.choose()
 #ExampPlugs <- readline(prompt="Enter plugs: ")
 filename <- basename(ExampleFilename)
 
-FileInput <- d18O10SIMSimport(ExampleFilename)
+FileInput <- GeneralSIMSImporter(ExampleFilename)
 
 NoBlanks <- FileInput[is.na(FileInput$File)==FALSE,]
 TotalAnalyses <- length(NoBlanks$File)
@@ -56,7 +59,7 @@ StartTime <- NoBlanks$DATETIME[1]
 EndTime <- NoBlanks$DATETIME[nrow(NoBlanks)]
 
 
-MassCalibTime <- seq(from = min(NoBlanks$DATETIME), to = max(NoBlanks$DATETIME), by = "12 hour")
+MassCalibTime <- seq(from = min(NoBlanks$DATETIME, na.rm=TRUE), to = max(NoBlanks$DATETIME, na.rm=TRUE), by = "12 hour")
 
 #### Calculate the total analysis time####
 #### based on sum of analysis lengths of less than 15 minutes
@@ -85,10 +88,10 @@ Standards <- FileInput[FileInput$MATERIAL=='STD'&is.na(FileInput$File)==FALSE,]
 StandardNum <- nrow(Standards)
 SampleNum <- nrow(Samples)
 BracketNum <- nrow(Brackets)
-BracketAve <- mean(Brackets$`2SDext`)
-BeamRange <- range(FileInput$`IP(nA)`, na.rm = TRUE)
-BeamAverage <- mean(FileInput$`IP(nA)`, na.rm = TRUE)
-Beam2SD <- 2*sd(FileInput$`IP(nA)`, na.rm = TRUE)
+BracketAve <- mean(Brackets$SE2int)
+BeamRange <- range(FileInput$IPnA, na.rm = TRUE)
+BeamAverage <- mean(FileInput$IPnA, na.rm = TRUE)
+Beam2SD <- 2*sd(FileInput$IPnA, na.rm = TRUE)
 
 #### Time summary table ####
 #### Combine these into a readable table
@@ -98,7 +101,7 @@ TimeSummary <- data.frame(StartTime, EndTime, AnalysisTime, SessionTime, Average
 #### Primary beam summary table ####
 #### Combine these into a readable table
 
-BeamSummary <- round(data.frame(BeamAverage, BeamRange[1], BeamRange[2], Beam2SD, AnalysistoAnalyis = mean(diff(FileInput$`IP(nA)`), na.rm = TRUE)), digits = 5)
+BeamSummary <- round(data.frame(BeamAverage, BeamRange[1], BeamRange[2], Beam2SD, AnalysistoAnalyis = mean(diff(FileInput$IPnA), na.rm = TRUE)), digits = 5)
 
 ####Create GGPLOT objects for important variables ####
 ####
@@ -131,33 +134,33 @@ StandardMeasVio <- ggplot(data = Brackets[!is.na(Brackets$`d18Omeas`),], aes(x =
 StandardMeasVio <- ggMarginal(StandardMeasVio, type = "histogram", margins = "x", size = 2, fill='grey', color='black', xparams = list(binwidth = 0.05), alpha = 0.25)
 
 
-PrimaryBeamHist <- ggplot(data = NoBlanks, aes(x=`IP(nA)`))+
+PrimaryBeamHist <- ggplot(data = NoBlanks, aes(x=`IPnA`))+
   geom_histogram(binwidth = 0.01, colour="black", fill="white")+
   xlab("IP (nA)")+
   theme_bw()
   
-RelOHOd18O <- ggplot(data = NoBlanks, aes(x = REL_OHO, y = STDd18O, color = GUESS.SAMP))+
+RelHydd18O <- ggplot(data = NoBlanks, aes(x = REL_Hyd, y = STDiso, color = GUESS.SAMP))+
   geom_point()+
   ylab("STD corrected \u03B418O (\u2030, VSMOW)")+
-  xlab("OHO-STD.OHO")+
+  xlab("Hyd-STD.Hyd")+
   theme_bw()+
   theme(legend.position="bottom")
   
-RelYieldOHO <- ggplot(data = NoBlanks, aes(x = REL_YIELD, y = REL_OHO, color = GUESS.SAMP))+
+RelYieldHyd <- ggplot(data = NoBlanks, aes(x = REL_YIELD, y = REL_Hyd, color = GUESS.SAMP))+
   geom_point()+
   xlab("Yield Relative to STD")+
-  ylab("OHO-STD.OHO")+
+  ylab("Hyd-STD.Hyd")+
   theme_bw()+
   theme(legend.position="bottom")
   
-RelYieldd18O <- ggplot(data = NoBlanks, aes(x = REL_YIELD, y = STDd18O, color = GUESS.SAMP))+
+RelYieldd18O <- ggplot(data = NoBlanks, aes(x = REL_YIELD, y = STDiso, color = GUESS.SAMP))+
   geom_point()+
   ylab("STD corrected \u03B418O (\u2030, VSMOW)")+
   xlab("Yield Relative to STD")+
   theme_bw()+
   theme(legend.position="bottom")
 
-PrimaryBeamTime <- ggplot(data = NoBlanks, aes(x = `DATETIME`, y=`IP(nA)`))+
+PrimaryBeamTime <- ggplot(data = NoBlanks, aes(x = `DATETIME`, y=`IPnA`))+
   geom_line()+
   geom_point(aes(color = GUESS.SAMP))+
   geom_vline(xintercept = MassCalibTime, colour = "red")+
@@ -199,7 +202,7 @@ d18OvsYield <- ggplot(data = NoBlanks, aes(x = `d18Omeas`, y=`Yield`))+
   theme_bw()+
   theme(legend.position="bottom")
 
-d18OvsBeam <- ggplot(data = Standards, aes(x=`IP(nA)`, y=d18Omeas))+
+d18OvsBeam <- ggplot(data = Standards, aes(x=`IPnA`, y=d18Omeas))+
   geom_point()+
   xlab("IP (nA)")+
   ylab("\u03B418O Measured (\u2030)")+
@@ -252,7 +255,7 @@ Materiald18O <- summaryBy(d18Omeas~MATERIAL*GUESS.SAMP, data = NoBlanks, FUN = c
 
 MaterialYield <- summaryBy(Yield~MATERIAL, data = NoBlanks, FUN = c(mean,sd,min,max))
 
-MaterialOHO <- summaryBy(OHO~MATERIAL, data = NoBlanks, FUN = c(mean,sd,min,max))
+MaterialHyd <- summaryBy(Hyd~MATERIAL, data = NoBlanks, FUN = c(mean,sd,min,max))
 
 MaterialDTFAX <- summaryBy(DTFAX~GUESS.SAMP, data = NoBlanks, FUN = c(mean,sd,min,max,length))
 
@@ -345,7 +348,7 @@ SEintTime
 
 ```{r OHOd18Ocross, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
 
-RelOHOd18O
+RelHydd18O
 
 ```
 \newline
@@ -361,7 +364,7 @@ RelYieldd18O
 
 ```{r RelYieldOHOcross, echo=FALSE, warning=FALSE}
 
-RelYieldOHO
+RelYieldHyd
 
 ```
 \newline
@@ -406,7 +409,7 @@ kable(MaterialYield)%>%
   
 ```{r Table 4, echo=FALSE, warning=FALSE, paged.print=TRUE}
 
-kable(MaterialOHO)%>%
+kable(MaterialHyd)%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
 ```

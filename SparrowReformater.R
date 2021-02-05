@@ -1,4 +1,4 @@
-DatumNesting <- function(InputFile, PlugNum = NA){
+DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   
   #### Args:
   #           InputFile:
@@ -13,7 +13,9 @@ DatumNesting <- function(InputFile, PlugNum = NA){
   library(readxl)
   library(httr)
   library(jsonlite)
-  
+  #InputFile <- fp
+  #PlugNum = NA
+  #Upload = FALSE
   source("GeneralSIMSImporter.R")
   
   BaseFile <- basename(InputFile)
@@ -21,6 +23,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
   
   Output <- GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
   Output <- Output[!is.na(Output$File),]
+  Output$GUESS.SAMP <- droplevels(Output$GUESS.SAMP)
   
   print(colnames(Output))
   
@@ -59,7 +62,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       
       SampleAnalyses <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
       l <- SampleAnalyses[j]
-      
+      #print(l)
       #Should only upload one sample worth of data at a time
       #l above should reference to row in Output dataframe.
       
@@ -70,7 +73,7 @@ DatumNesting <- function(InputFile, PlugNum = NA){
         
         
         if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
-          
+          #print(c(l,i))
           if(!is.na(Output[l,i])&is.numeric(Output[l,i])){
             value <- Output[l,i]
           }else{
@@ -132,17 +135,25 @@ DatumNesting <- function(InputFile, PlugNum = NA){
       data=Session
     )
     
+    if(Upload){
+      
     response <- PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
     
     errors<-content(response)
     
     print(errors)
+              
+    }else{
+      NewFile<-gsub("\\..*","",BaseFile)
+      write_json(request, paste("~/Documents/SparrowJSONTest/",NewFile,".json", sep = ""))}
+      
+  
     
     
   }
   
   #PUT(url="http://backend:5000/api/v1/import-data/session", body=SampleList, encode = "json")
   
-  return(print("Sparrow upload", BaseFile))
+  return(print("DONE"))#print("Sparrow upload", BaseFile))
   #return(SampleList)
 }
