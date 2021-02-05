@@ -13,7 +13,9 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   library(readxl)
   library(httr)
   library(jsonlite)
-  
+  #InputFile <- fp
+  #PlugNum = NA
+  #Upload = FALSE
   source("GeneralSIMSImporter.R")
   
   BaseFile <- basename(InputFile)
@@ -21,6 +23,7 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   
   Output <- GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
   Output <- Output[!is.na(Output$File),]
+  Output$GUESS.SAMP <- droplevels(Output$GUESS.SAMP)
   
   print(colnames(Output))
   
@@ -59,7 +62,7 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
       
       SampleAnalyses <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
       l <- SampleAnalyses[j]
-      
+      #print(l)
       #Should only upload one sample worth of data at a time
       #l above should reference to row in Output dataframe.
       
@@ -70,7 +73,7 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
         
         
         if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
-          
+          #print(c(l,i))
           if(!is.na(Output[l,i])&is.numeric(Output[l,i])){
             value <- Output[l,i]
           }else{

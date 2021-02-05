@@ -21,7 +21,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   #PlugNum <- NA
   
   ####Test to see if input file is a proper Excel file with d18O or d13C in name ####
-  InputFile <- fp #input.file <- "/Users/macrostrat/Projects/EarthCube-Geochron/Sparrow-instances/Sparrow-WiscSIMS/Test-Data/20130917_d13C_Ammonites.xls"
+  #InputFile <- fp #input.file <- "/Users/macrostrat/Projects/EarthCube-Geochron/Sparrow-instances/Sparrow-WiscSIMS/Test-Data/20130917_d13C_Ammonites.xls"
   
   if(grepl("d18O|d13C", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
     
