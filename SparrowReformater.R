@@ -49,69 +49,75 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   
   #Make nested list for JSON format and Sparrow uploading
   m<-0
+  n<-0
   
   SampleList <- list()
   
   for(k in 1:length(levels(Output$GUESS.SAMP))){
     
     SampleList <- list()
+    print(levels(Output$GUESS.SAMP)[k])
+    SmallTable <- Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],]
+    #print(SmallTable$GUESS.SAMP)
+    Session <- list()
+    request <- list()
+    print(nrow(SmallTable))
+    analysis <- list()
+    DatumList <- list()
+    AttributeList <- list()
     
-    
-    
-    for(j in 1:nrow(Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],])){
+    for(j in 1:nrow(SmallTable)){
       
-      SampleAnalyses <- which(Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k])
-      l <- SampleAnalyses[j]
-      #print(l)
-      #Should only upload one sample worth of data at a time
-      #l above should reference to row in Output dataframe.
-      
+      analysis <- list()
       DatumList <- list()
       AttributeList <- list()
       m <- 1
-      for(i in 1:ncol(Output)){
+      n <- 1
+      for(i in 1:ncol(SmallTable)){
         
         
-        if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Numeric"){
+        if(LookupDF$Type[LookupDF$ColNames==colnames(SmallTable)[i]]=="Numeric"){
           #print(c(l,i))
-          if(!is.na(Output[l,i])&is.numeric(Output[l,i])){
-            value <- Output[l,i]
+          if(!is.na(SmallTable[j,i])&is.numeric(SmallTable[j,i])){
+            value <- SmallTable[j,i]
           }else{
             value <- -1042
           }
           
           DatumList [[m]] <- list(value = value,
-                                  type = list(parameter = colnames(Output)[i],
-                                              unit = LookupDF$unit[LookupDF$ColNames==colnames(Output)[i]]))
+                                  type = list(parameter = colnames(SmallTable)[i],
+                                              unit = LookupDF$unit[LookupDF$ColNames==colnames(SmallTable)[i]]))
 
           m <- m+1
         }
         
-        if(LookupDF$Type[LookupDF$ColNames==colnames(Output)[i]]=="Text"){
+        if(LookupDF$Type[LookupDF$ColNames==colnames(SmallTable)[i]]=="Text"){
           
-          if(!is.na(Output[l,i])&!is.numeric(Output[l,i])){
-            note <- Output[l,i]
+          if(!is.na(SmallTable[j,i])&!is.numeric(SmallTable[j,i])){
+            note <- SmallTable[j,i]
           }else{
             note <- "Empty"
           }
 
-          AttributeList[[m]] <- list(parameter = colnames(Output)[i],
+          AttributeList[[n]] <- list(parameter = colnames(SmallTable)[i],
                                      value = note)
           
-          m <- m+1
+          n <- n+1
         }
         
         
         #print(m)
       }
       
-      analysis[[j]] <- list(analysis_name = Output$File[l],
+      analysis[[j]] <- list(analysis_name = SmallTable$File[j],
                             analysis_type = IsotopeMethod,
                             datum = DatumList,
                             attribute = AttributeList,
-                            material = Output$MATERIAL[l],
+                            material = SmallTable$MATERIAL[j],
                             session_index = j
       )
+      #print(j)
+      #print(nrow(SmallTable))
       
       
     }
@@ -119,6 +125,7 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
     Session <- list(
       name = paste(BaseFile, levels(Output$GUESS.SAMP)[k], sep = "_"),
       sample = list(name = levels(Output$GUESS.SAMP)[k]),
+      project = list(name = BaseFile),
       date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
       analysis = analysis)
     
@@ -132,20 +139,22 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
     
     request <- list(
       filename=paste(BaseFile, k),
-      data=Session
-    )
+      data=Session)
     
     if(Upload){
       
-    response <- PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
+    response <- PUT(url="http://localhost:5002/api/v2/models/session", body=request, encode = "json") #PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
     
     errors<-content(response)
     
     print(errors)
               
     }else{
+      print("Make JSON")
       NewFile<-gsub("\\..*","",BaseFile)
-      write_json(request, paste("~/Documents/SparrowJSONTest/",NewFile,".json", sep = ""))}
+      write_json(request, paste("~/Documents/SparrowJSONTest/",k,"_",NewFile,".json", sep = ""), auto_unbox = TRUE, pretty = TRUE)
+      
+      }
       
   
     

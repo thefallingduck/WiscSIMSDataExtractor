@@ -13,19 +13,7 @@ d18OFileList
 
 # loop through the file list to read in data and clean it up
 
-for (file in d18OFileList) {tryCatch({
-  
-  fp <- paste(FileDirectory, file, sep="/")
-  
-  ExampleFilename <- fp
-  BaseFile <- basename(file)
-  print(BaseFile)
-  
-  if(grepl("_d18O_", BaseFile)){
-  DatumNesting(fp, Upload = FALSE)
-  }
-})
-}
+
 
 for (file in d18OFileList) {tryCatch({
   
