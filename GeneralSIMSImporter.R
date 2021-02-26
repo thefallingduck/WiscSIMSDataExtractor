@@ -22,7 +22,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   ####Test to see if input file is a proper Excel file with d18O or d13C in name ####
   #InputFile <- fp #input.file <- "/Users/macrostrat/Projects/EarthCube-Geochron/Sparrow-instances/Sparrow-WiscSIMS/Test-Data/20130917_d13C_Ammonites.xls"
-  
+  #InputFile <- file.choose()
   if(grepl("d18O|d13C", InputFile)==FALSE|grepl(".xls[x]?", InputFile)==FALSE){
     
     stop('Not valid Excel file')
@@ -64,7 +64,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Output$MATERIAL[is.na(Output$File)==TRUE]<-NA
   
-  Output$MATERIAL[!is.na(Output[4])&Output$MATERIAL=='STD']<-'STD?'
+  #Output$MATERIAL[!is.na(Output[4])&Output$MATERIAL=='STD']<-'STD?'
+  #Dropped the above line to avoid adding more levels in the GUESS.SAMP column later...
   
   #### Identify sample-standard-standard brackets####
   #### This uses Output$MATERIAL column and the spacing of NAs to
@@ -103,6 +104,10 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   str <- Output$Comment[!is.na(Output$File)&Output$MATERIAL=='Sample']
   str <- str[!is.na(str)]
+  
+  File <- Output$File[!is.na(Output$File)&Output$MATERIAL=='Sample']
+  File <- File[!is.na(File)]
+  File <- File[grep('.asc$', File)]
 
   Comment <- str
   
@@ -127,13 +132,13 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     if(GuessPlugs>2){
     
-    df <- data.frame(Comment, GUESS.SAMP = as.factor(cutree(hc,k=GuessPlugs)))
+    df <- data.frame(Comment, File, GUESS.SAMP = as.factor(cutree(hc,k=GuessPlugs)))
     
     levels(df$GUESS.SAMP) <- df$Comment[match(levels(df$GUESS.SAMP), df$GUESS.SAMP)]
     
     }else{
       
-      df <- data.frame(Comment, GUESS.SAMP = as.factor(rep(Comment[1], times = length(Comment))))
+      df <- data.frame(Comment, File, GUESS.SAMP = as.factor(rep(Comment[1], times = length(Comment))))
       
       levels(df$GUESS.SAMP) <- df$Comment[match(levels(df$GUESS.SAMP), df$GUESS.SAMP)]
       
@@ -143,10 +148,12 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   #### Bind GUESS.SAMP to Output ####
   
-  Output <- merge(Output, df, by.x="Comment", by.y = "Comment", all.x = TRUE, sort = FALSE)
+  Output <- merge(Output, df, by.x="File", by.y = "File", all.x = TRUE, sort = FALSE, suffixes = c("",".y"))
   Output$GUESS.SAMP <- as.character(Output$GUESS.SAMP)
   Output$GUESS.SAMP[is.na(Output$GUESS.SAMP)==TRUE] <- Output$MATERIAL[is.na(Output$GUESS.SAMP)==TRUE]
   Output$GUESS.SAMP <- as.factor(Output$GUESS.SAMP)
+  
+  Output <- Output[,!(names(Output) == "Comment.y")]
   
   #### Relative Hydride, Relative Yield, recalc isotope####
   Output$UNIQUEGRP <- as.factor(paste(Output$MATERIAL, Output$GROUPNUM))

@@ -63,12 +63,12 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
     request <- list()
     print(nrow(SmallTable))
     analysis <- list()
-    DatumList <- list()
-    AttributeList <- list()
+    #DatumList <- list()
+    #AttributeList <- list()
     
     for(j in 1:nrow(SmallTable)){
       
-      analysis <- list()
+      #analysis <- list()
       DatumList <- list()
       AttributeList <- list()
       m <- 1
@@ -143,7 +143,7 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
     
     if(Upload){
       
-    response <- PUT(url="http://localhost:5002/api/v2/models/session", body=request, encode = "json") #PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
+    response <- PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json") #PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
     
     errors<-content(response)
     
