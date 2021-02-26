@@ -1,7 +1,7 @@
 #### Batch produce JSON files to test Sparrow uploads ####
 library(purrr)
 source('SparrowReformater.R')
-possibly_DatumNesting <- possibly(DatumNesting, otherwise = paste(fp, "failed to load", sep = " "))
+possibly_DatumNesting <- possibly(DatumNesting, otherwise = "failed to load")
 FileDirectory <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files"
 
 FileList <- as.vector(list.files(path = FileDirectory, pattern = "\\.xl?", recursive = TRUE))
