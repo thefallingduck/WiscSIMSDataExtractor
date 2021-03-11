@@ -1,13 +1,14 @@
 #### Batch produce JSON files to test Sparrow uploads ####
 library(purrr)
 source('SparrowReformater.R')
+source('GeneralSIMSImporter.R')
 possibly_DatumNesting <- possibly(DatumNesting, otherwise = "failed to load")
-FileDirectory <- "/Users/macrostrat/Dropbox/SIMS batch data import/SIMS batch data import/SIMS data files"
+FileDirectory <- "/Users/macrostrat/Desktop/SIMSdatafiles"
 
 FileList <- as.vector(list.files(path = FileDirectory, pattern = "\\.xl?", recursive = TRUE))
 
 d18OFileList <- FileList[grepl("d18O", FileList)]
-d18OFileList <- d18OFileList[grepl(".xls?$", d18OFileList)]
+d18OFileList <- d18OFileList[grepl(".xlsx?$", d18OFileList)]
 d18OFileList
 
 
@@ -22,6 +23,7 @@ for (file in d18OFileList) {tryCatch({
   ExampleFilename <- fp
   BaseFile <- basename(file)
   print(BaseFile)
+  #Aehhh <- GeneralSIMSImporter(fp)
   
   if(grepl("_d18O_", BaseFile)){
     possibly_DatumNesting(fp, Upload = FALSE)

@@ -45,7 +45,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   library(readxl)
   library(plyr)
   
-  Input <- as.data.frame(read_excel(InputFile))
+  Input <- as.data.frame(read_excel(InputFile, guess_max = 1000, range = cell_cols("A:Z")))
   
   source("ColumnRename.R")
   source("StandardID.R")
@@ -103,11 +103,18 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   #### Number of clusters IDed manually or set
   
   str <- Output$Comment[!is.na(Output$File)&Output$MATERIAL=='Sample']
+  #print(length(str))
+  str[is.na(str)] <- "Fill"
   str <- str[!is.na(str)]
+  #print(length(str))
   
   File <- Output$File[!is.na(Output$File)&Output$MATERIAL=='Sample']
+  #print(length(File))
   File <- File[!is.na(File)]
-  File <- File[grep('.asc$', File)]
+  #print(length(File))
+  #print(File)
+  #File <- File[grep('.asc$', File)]
+  #print(length(File))
 
   Comment <- str
   
@@ -121,7 +128,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   if(is.numeric(PlugNum)){
     
-    df <- data.frame(Comment, GUESS.SAMP = as.factor(cutree(hc,k=PlugNum)))
+    df <- data.frame(Comment, File, GUESS.SAMP = as.factor(cutree(hc,k=PlugNum)))
     
     levels(df$GUESS.SAMP) <- df$Comment[match(levels(df$GUESS.SAMP), df$GUESS.SAMP)]
     
@@ -193,7 +200,9 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   }
 
   #### Bracket level recalculation of standard, hydride, and yield####
-  for(i in 1:length(Samples)){
+  tryCatch(
+    {
+      for(i in 1:length(Samples)){
     
     StartGroup <- AllGroups[match(Samples[i],AllGroups)-1]
     EndGroup <- AllGroups[match(Samples[i],AllGroups)+1]
@@ -226,7 +235,13 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     
     Output$REL_Hyd[ReplaceLogic] <- Output[ReplaceLogic, 19]-mean(Output[SelectLogic, 19], na.rm=TRUE)}
     
-  }
+    }
+    },
+    warning=function(cond){
+      message(paste("Bracket Calculation failed"))
+    },
+    finally = {}
+  )
   
   for(i in 1:nrow(Output[Output$Comment == "bracket average and 2SD"&!is.na(Output$Comment),])){
     
