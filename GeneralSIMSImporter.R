@@ -135,7 +135,9 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   }else{
     
     
-    GuessPlugs <- length(c(which(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&is.na(Output$MATERIAL)==FALSE]%%2)!=0)))
+    #GuessPlugs <- length(c(which(diff(Output$GROUPNUM[Output$MATERIAL=="Sample"&is.na(Output$MATERIAL)==FALSE]%%2)!=0)))
+    Duration <- quantile(Output$AnalysisLength, probs = c(.99), na.rm = TRUE)
+    GuessPlugs <- length(Output$AnalysisLength[Output$AnalysisLength>Duration&!is.na(Output$AnalysisLength)])
     
     if(GuessPlugs>2){
     
@@ -144,6 +146,8 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     levels(df$GUESS.SAMP) <- df$Comment[match(levels(df$GUESS.SAMP), df$GUESS.SAMP)]
     
     }else{
+      
+      #Replace Comment[1] with something more complex...
       
       df <- data.frame(Comment, File, GUESS.SAMP = as.factor(rep(Comment[1], times = length(Comment))))
       
