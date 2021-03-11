@@ -39,11 +39,11 @@ library(svDialogs)
 
 source('GeneralSIMSImporter.R')
 
-#ExampleFilename <- "/Users/macrostrat/Downloads/20200815_d18O_Leet/20200815_d18O_Leet_finalv2.xlsx" #file.choose() #"C:/Users/Ben/Desktop/20191021_d18O_Helser.xlsx" #file.choose()
+ExampleFilename <- "/Users/macrostrat/Desktop/SIMSdatafiles/20210224_d18O_Helser-Linzmeier/20210224_d18O_Helser-Linzmeier_final.xlsx" #file.choose() #"C:/Users/Ben/Desktop/20191021_d18O_Helser.xlsx" #file.choose()
 #ExampPlugs <- readline(prompt="Enter plugs: ")
 filename <- basename(ExampleFilename)
 
-FileInput <- GeneralSIMSImporter(ExampleFilename)
+FileInput <- GeneralSIMSImporter(ExampleFilename, PlugNum = 2)
 
 NoBlanks <- FileInput[is.na(FileInput$File)==FALSE,]
 TotalAnalyses <- length(NoBlanks$File)
