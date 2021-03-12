@@ -34,7 +34,7 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   LookupDF$Dictionary <-
     as.list(strsplit(
       as.character(LookupDF$DictionaryColNames),
-      split = ", ",
+      split = "; ",
       useBytes = TRUE
     ))
   

@@ -11,12 +11,22 @@ d18OFileList <- FileList[grepl("d18O", FileList)]
 d18OFileList <- d18OFileList[grepl(".xlsx?$", d18OFileList)]
 d18OFileList
 
+d13CFileList <- FileList[grepl("d13C", FileList)]
+d13C_Col_list <- vector()
+
+for(file in d13CFileList){
+  
+  fp <- paste(FileDirectory, file, sep="/")
+  Names <- colnames(read_excel(fp))
+  d13C_Col_list <- append(d13C_Col_list, Names)
+  
+}
 
 # loop through the file list to read in data and clean it up
 
 
 
-for (file in d18OFileList) {tryCatch({
+for (file in FileList) {tryCatch({
   
   fp <- paste(FileDirectory, file, sep="/")
   
@@ -25,9 +35,9 @@ for (file in d18OFileList) {tryCatch({
   print(BaseFile)
   #Aehhh <- GeneralSIMSImporter(fp)
   
-  if(grepl("_d18O_", BaseFile)){
+  #if(grepl("_d18O_", BaseFile)){
     possibly_DatumNesting(fp, Upload = FALSE)
-  }
+  #}
 })
 }
 
