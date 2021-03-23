@@ -109,12 +109,24 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
         #print(m)
       }
       
+      if(SmallTable$MATERIAL[j]=="STD"){
+        
+        standard_name <- SmallTable$RegexSTD[j]
+        
+      }else{
+        
+        standard_name <- NULL
+        
+      }
       analysis[[j]] <- list(analysis_name = SmallTable$File[j],
                             analysis_type = IsotopeMethod,
+                            date = gsub(" ", "T", SmallTable$DATETIME[j]),
+                            is_standard = SmallTable$MATERIAL[j]=="STD",
                             datum = DatumList,
                             attribute = AttributeList,
                             material = SmallTable$MATERIAL[j],
-                            session_index = j
+                            session_index = j,
+                            standard_sample = standard_name
       )
       #print(j)
       #print(nrow(SmallTable))

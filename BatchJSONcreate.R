@@ -3,10 +3,12 @@ library(purrr)
 source('SparrowReformater.R')
 source('GeneralSIMSImporter.R')
 possibly_DatumNesting <- possibly(DatumNesting, otherwise = "failed to load")
-FileDirectory <- "/Users/macrostrat/Desktop/SIMSdatafiles"
+FileDirectory <- "/Users/macrostrat/Desktop/OnlySIMSExcel"
 
 FileList <- as.vector(list.files(path = FileDirectory, pattern = "\\.xl?", recursive = TRUE))
 
+DataFileList <- FileList[grepl('^[0-9]{8}_',basename(FileList))]
+DataFileList <- DataFileList[!grepl('tuning', basename(DataFileList))]
 d18OFileList <- FileList[grepl("d18O", FileList)]
 d18OFileList <- d18OFileList[grepl(".xlsx?$", d18OFileList)]
 d18OFileList
@@ -26,11 +28,11 @@ for(file in d13CFileList){
 
 
 
-for (file in FileList) {tryCatch({
+for (file in DataFileList) {
   
   fp <- paste(FileDirectory, file, sep="/")
   
-  ExampleFilename <- fp
+  #ExampleFilename <- fp
   BaseFile <- basename(file)
   print(BaseFile)
   #Aehhh <- GeneralSIMSImporter(fp)
@@ -38,7 +40,7 @@ for (file in FileList) {tryCatch({
   #if(grepl("_d18O_", BaseFile)){
     possibly_DatumNesting(fp, Upload = FALSE)
   #}
-})
+#})
 }
 
 
