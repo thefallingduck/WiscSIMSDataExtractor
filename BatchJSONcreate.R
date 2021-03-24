@@ -27,7 +27,7 @@ for(file in d13CFileList){
 # loop through the file list to read in data and clean it up
 
 
-
+Processed <- list()
 for (file in DataFileList) {
   
   fp <- paste(FileDirectory, file, sep="/")
@@ -36,14 +36,14 @@ for (file in DataFileList) {
   BaseFile <- basename(file)
   print(BaseFile)
   #Aehhh <- GeneralSIMSImporter(fp)
-  
+  Processed<-c(Processed, map(fp, possibly_DatumNesting, Upload = FALSE))
   #if(grepl("_d18O_", BaseFile)){
-    possibly_DatumNesting(fp, Upload = FALSE)
+    #possibly_DatumNesting(fp, Upload = FALSE)
   #}
 #})
 }
 
-
+Processed<-map(FileList, possibly_DatumNesting)
 
 library(purrr)
 
