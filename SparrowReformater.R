@@ -1,5 +1,6 @@
-DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
-  
+DatumNesting <- function(InputFile,
+                         PlugNum = NA,
+                         Upload = TRUE) {
   #### Args:
   #           InputFile:
   #           Isotope method:
@@ -21,22 +22,21 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   BaseFile <- basename(InputFile)
   analysis <- list()
   
-  Output <- GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
-  Output <- Output[!is.na(Output$File),]
+  Output <-
+    GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
+  Output <- Output[!is.na(Output$File), ]
   Output$GUESS.SAMP <- droplevels(Output$GUESS.SAMP)
   
   print(colnames(Output))
   
   IsotopeMethod <- ""
   
-  if(grepl("d18O", InputFile)){
-    
+  if (grepl("d18O", InputFile)) {
     IsotopeMethod <- "d18O10"
     
   }
   
-  if(grepl("d13C", InputFile)){
-    
+  if (grepl("d13C", InputFile)) {
     IsotopeMethod <- "d13C7"
     
   }
@@ -48,16 +48,16 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
   LookupDF <- read_excel(tf)
   
   #Make nested list for JSON format and Sparrow uploading
-  m<-0
-  n<-0
+  m <- 0
+  n <- 0
   
   SampleList <- list()
   
-  for(k in 1:length(levels(Output$GUESS.SAMP))){
-    
+  for (k in 1:length(levels(Output$GUESS.SAMP))) {
     SampleList <- list()
     print(levels(Output$GUESS.SAMP)[k])
-    SmallTable <- Output[Output$GUESS.SAMP==levels(Output$GUESS.SAMP)[k],]
+    SmallTable <-
+      Output[Output$GUESS.SAMP == levels(Output$GUESS.SAMP)[k], ]
     #print(SmallTable$GUESS.SAMP)
     Session <- list()
     request <- list()
@@ -66,67 +66,69 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
     #DatumList <- list()
     #AttributeList <- list()
     
-    for(j in 1:nrow(SmallTable)){
-      
+    for (j in 1:nrow(SmallTable)) {
       #analysis <- list()
       DatumList <- list()
       AttributeList <- list()
       m <- 1
       n <- 1
-      for(i in 1:ncol(SmallTable)){
-        
-        
-        if(LookupDF$Type[LookupDF$ColNames==colnames(SmallTable)[i]]=="Numeric"){
+      for (i in 1:ncol(SmallTable)) {
+        if (LookupDF$Type[LookupDF$ColNames == colnames(SmallTable)[i]] == "Numeric") {
           #print(c(l,i))
-          if(!is.na(SmallTable[j,i])&is.numeric(SmallTable[j,i])){
-            value <- SmallTable[j,i]
-          }else{
+          if (!is.na(SmallTable[j, i]) & is.numeric(SmallTable[j, i])) {
+            value <- SmallTable[j, i]
+          } else{
             value <- -1042
           }
           
-          DatumList [[m]] <- list(value = value,
-                                  type = list(parameter = colnames(SmallTable)[i],
-                                              unit = LookupDF$unit[LookupDF$ColNames==colnames(SmallTable)[i]]))
-
-          m <- m+1
+          DatumList [[m]] <- list(
+            value = value,
+            type = list(
+              parameter = colnames(SmallTable)[i],
+              unit = LookupDF$unit[LookupDF$ColNames ==
+                                     colnames(SmallTable)[i]]
+            )
+          )
+          
+          m <- m + 1
         }
         
-        if(LookupDF$Type[LookupDF$ColNames==colnames(SmallTable)[i]]=="Text"){
-          
-          if(!is.na(SmallTable[j,i])&!is.numeric(SmallTable[j,i])){
-            note <- SmallTable[j,i]
-          }else{
+        if (LookupDF$Type[LookupDF$ColNames == colnames(SmallTable)[i]] ==
+            "Text") {
+          if (!is.na(SmallTable[j, i]) & !is.numeric(SmallTable[j, i])) {
+            note <- SmallTable[j, i]
+          } else{
             note <- "Empty"
           }
-
-          AttributeList[[n]] <- list(parameter = colnames(SmallTable)[i],
-                                     value = note)
           
-          n <- n+1
+          AttributeList[[n]] <-
+            list(parameter = colnames(SmallTable)[i],
+                 value = note)
+          
+          n <- n + 1
         }
         
         
         #print(m)
       }
       
-      if(SmallTable$MATERIAL[j]=="STD"){
-        
+      if (SmallTable$MATERIAL[j] == "STD") {
         standard_name <- SmallTable$RegexSTD[j]
         
-      }else{
-        
+      } else{
         standard_name <- NULL
         
       }
-      analysis[[j]] <- list(analysis_name = SmallTable$File[j],
-                            analysis_type = IsotopeMethod,
-                            date = gsub(" ", "T", SmallTable$DATETIME[j]),
-                            is_standard = SmallTable$MATERIAL[j]=="STD",
-                            datum = DatumList,
-                            attribute = AttributeList,
-                            material = SmallTable$MATERIAL[j],
-                            session_index = j,
-                            standard_sample = standard_name
+      analysis[[j]] <- list(
+        analysis_name = SmallTable$File[j],
+        analysis_type = IsotopeMethod,
+        date = gsub(" ", "T", SmallTable$DATETIME[j]),
+        is_standard = SmallTable$MATERIAL[j] == "STD",
+        datum = DatumList,
+        attribute = AttributeList,
+        material = SmallTable$MATERIAL[j],
+        session_index = j,
+        standard_sample = standard_name
       )
       #print(j)
       #print(nrow(SmallTable))
@@ -139,7 +141,8 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
       sample = list(name = levels(Output$GUESS.SAMP)[k]),
       project = list(name = BaseFile),
       date = gsub(" ", "T", min(Output$DATETIME, na.rm = TRUE)),
-      analysis = analysis)
+      analysis = analysis
+    )
     
     # SampleList <- append(SampleList,
     #                      list(list(
@@ -149,26 +152,39 @@ DatumNesting <- function(InputFile, PlugNum = NA, Upload = TRUE){
     #                        analysis = analysis,
     #                                            date = Output$DATETIME[1])))
     
-    request <- list(
-      filename=paste(BaseFile, k),
-      data=Session)
+    request <- list(filename = paste(BaseFile, k),
+                    data = Session)
     
-    if(Upload){
+    if (Upload) {
+      response <-
+        PUT(url = "http://backend:5000/api/v1/import-data/session",
+            body = request,
+            encode = "json") #PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
       
-    response <- PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json") #PUT(url="http://backend:5000/api/v1/import-data/session", body=request, encode = "json")
-    
-    errors<-content(response)
-    
-    print(errors)
-              
-    }else{
+      errors <- content(response)
+      
+      print(errors)
+      
+    } else{
       print("Make JSON")
-      NewFile<-gsub("\\..*","",BaseFile)
-      write_json(request, paste("~/Documents/SparrowJSONTest/",k,"_",NewFile,".json", sep = ""), auto_unbox = TRUE, pretty = TRUE)
+      NewFile <- gsub("\\..*", "", BaseFile)
+      write_json(
+        request,
+        paste(
+          "~/Documents/SparrowJSONTest/",
+          k,
+          "_",
+          NewFile,
+          ".json",
+          sep = ""
+        ),
+        auto_unbox = TRUE,
+        pretty = TRUE
+      )
       
-      }
-      
-  
+    }
+    
+    
     
     
   }

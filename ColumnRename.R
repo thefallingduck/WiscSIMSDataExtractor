@@ -10,8 +10,8 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   #     OutputFile: Dataframe with uniform column names
   library(readxl)
   library(httr)
-
-
+  
+  
   #IsotopeMethod <- "d13C7"
   #InputFile <- as.data.frame(read_excel(input.file))
   
@@ -39,7 +39,7 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
     ))
   
   SmallLookUp <-
-    LookupDF[grep(IsotopeMethod, LookupDF$SIMSmethods), ]
+    LookupDF[grep(IsotopeMethod, LookupDF$SIMSmethods),]
   
   StandardColNames <- vector(length = length(ColumnNames))
   
@@ -65,7 +65,10 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
     if (length(MissingColumns) > 0) {
       warning(paste("Missing:", toString(MissingColumns)))
     }
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+  })
+  # }, error = function(e) {
+  #   cat("ERROR :", conditionMessage(e), "\n")
+  # })
   
   colnames(InputFile) <- StandardColNames
   
@@ -73,18 +76,28 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   InputFile$INDEX <- 1:nrow(InputFile)
   
   #### Analysis Lengths ####
-  Times <- InputFile[,c("Date","Time","INDEX")]
+  Times <- InputFile[, c("Date", "Time", "INDEX")]
   DATETIME <- paste(Times$Date, format(Times$Time, "%H:%M"))
-  DATETIME[DATETIME=="NA NA"] <- NA
+  DATETIME[DATETIME == "NA NA"] <- NA
   InputFile$DATETIME <- as.POSIXct(DATETIME)
   Times$Time <- as.POSIXct(DATETIME)
-  Times2 <- Times[is.na(Times$Time)==FALSE,]
-  Times2$AnalysisLength <- c(NA, difftime(Times2$Time[-1], Times2$Time[-length(Times2$Time)], units = "mins"))
+  Times2 <- Times[is.na(Times$Time) == FALSE, ]
+  Times2$AnalysisLength <-
+    c(NA, difftime(Times2$Time[-1], Times2$Time[-length(Times2$Time)], units = "mins"))
   
-  InputFile <- merge(InputFile, Times2, by.x="INDEX", by.y = "INDEX", all.x = TRUE, sort = FALSE)
+  InputFile <-
+    merge(
+      InputFile,
+      Times2,
+      by.x = "INDEX",
+      by.y = "INDEX",
+      all.x = TRUE,
+      sort = FALSE
+    )
   
-  InputFile <- InputFile[,!(colnames(InputFile) %in% c("Date.y", "Time.y"))]
-  InputFile <- InputFile[sort(InputFile$INDEX),]
+  InputFile <-
+    InputFile[, !(colnames(InputFile) %in% c("Date.y", "Time.y"))]
+  InputFile <- InputFile[sort(InputFile$INDEX), ]
   
   return(InputFile)
   
