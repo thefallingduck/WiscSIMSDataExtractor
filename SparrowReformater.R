@@ -25,7 +25,9 @@ DatumNesting <- function(InputFile,
   Output <-
     GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
   Output <- Output[!is.na(Output$File), ]
+  Output$GUESS.SAMP <- as.factor(Output$GUESS.SAMP)
   Output$GUESS.SAMP <- droplevels(Output$GUESS.SAMP)
+  Output <- Output[!is.na(Output$File)&!is.na(Output$DTFAX),]
   
   print(colnames(Output))
   
@@ -46,6 +48,7 @@ DatumNesting <- function(InputFile,
   GET(url1, write_disk(tf <- tempfile(fileext = ".xlsx")))
   
   LookupDF <- read_excel(tf)
+  
   
   #Make nested list for JSON format and Sparrow uploading
   m <- 0
