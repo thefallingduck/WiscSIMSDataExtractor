@@ -79,7 +79,7 @@ AddBracketStructure <- function(Input) {
     }
     GUESS.SAMP[SelectRange] <- MountName
   }
-  GUESS.SAMP[is.na(Output$GROUPNUM)] <- NA
+  #GUESS.SAMP[is.na(Output$GROUPNUM)] <- NA
   Output$GUESS.SAMP <- GUESS.SAMP
   
   
