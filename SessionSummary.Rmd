@@ -19,7 +19,7 @@ link-citations: yes
 always_allow_html: yes
 ---
 
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(readxl)
@@ -107,145 +107,145 @@ BeamSummary <- round(data.frame(BeamAverage, BeamRange[1], BeamRange[2], Beam2SD
 ####
 
 Standard2SDHist <- ggplot(data = Brackets, aes(x=`SE2int`))+
-  geom_histogram(binwidth = 0.05, colour="black")+
-  xlab("Bracket 2SD (‰)")+
-  xlim(0,1)+
-  theme_bw()
+geom_histogram(binwidth = 0.05, colour="black")+
+xlab("Bracket 2SD (‰)")+
+xlim(0,1)+
+theme_bw()
 
 StandardMeasHist <- ggplot(data = Brackets, aes(x= d18Omeas))+
-  geom_histogram(binwidth = 0.05, alpha = 0.25)+
-  xlab("Bracket Measured \u03B418O")+
-  xlim(min(Brackets$d18Omeas)-.5, max(Brackets$d18Omeas)+.5)+
-  theme_bw()
-  
-  
+geom_histogram(binwidth = 0.05, alpha = 0.25)+
+xlab("Bracket Measured \u03B418O")+
+xlim(min(Brackets$d18Omeas)-.5, max(Brackets$d18Omeas)+.5)+
+theme_bw()
+
+
 
 StandardMeasVio <- ggplot(data = Brackets[!is.na(Brackets$`d18Omeas`),], aes(x = GUESS.SAMP, y = d18Omeas, fill = GUESS.SAMP))+
-  geom_violin(trim=FALSE)+
-  geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, alpha = 0.5)+
-  geom_point(alpha = 0)+
-  xlab("Estimated mount")+
-  coord_flip()+
-  ylab("Bracket Measured \u03B418O")+
-  ylim(min(Brackets$d18Omeas)-.5, max(Brackets$d18Omeas)+.5)+
-  theme_bw()+
-  theme(legend.position = "none")
-  
+geom_violin(trim=FALSE)+
+geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, alpha = 0.5)+
+geom_point(alpha = 0)+
+xlab("Estimated mount")+
+coord_flip()+
+ylab("Bracket Measured \u03B418O")+
+ylim(min(Brackets$d18Omeas)-.5, max(Brackets$d18Omeas)+.5)+
+theme_bw()+
+theme(legend.position = "none")
+
 StandardMeasVio <- ggMarginal(StandardMeasVio, type = "histogram", margins = "x", size = 2, fill='grey', color='black', xparams = list(binwidth = 0.05), alpha = 0.25)
 
 
 PrimaryBeamHist <- ggplot(data = NoBlanks, aes(x=`IPnA`))+
-  geom_histogram(binwidth = 0.01, colour="black", fill="white")+
-  xlab("IP (nA)")+
-  theme_bw()
-  
+geom_histogram(binwidth = 0.01, colour="black", fill="white")+
+xlab("IP (nA)")+
+theme_bw()
+
 RelHydd18O <- ggplot(data = NoBlanks, aes(x = REL_Hyd, y = STDiso, color = GUESS.SAMP))+
-  geom_point()+
-  ylab("STD corrected \u03B418O (\u2030, VSMOW)")+
-  xlab("Hyd-STD.Hyd")+
-  theme_bw()+
-  theme(legend.position="bottom")
-  
+geom_point()+
+ylab("STD corrected \u03B418O (\u2030, VSMOW)")+
+xlab("Hyd-STD.Hyd")+
+theme_bw()+
+theme(legend.position="bottom")
+
 RelYieldHyd <- ggplot(data = NoBlanks, aes(x = REL_YIELD, y = REL_Hyd, color = GUESS.SAMP))+
-  geom_point()+
-  xlab("Yield Relative to STD")+
-  ylab("Hyd-STD.Hyd")+
-  theme_bw()+
-  theme(legend.position="bottom")
-  
+geom_point()+
+xlab("Yield Relative to STD")+
+ylab("Hyd-STD.Hyd")+
+theme_bw()+
+theme(legend.position="bottom")
+
 RelYieldd18O <- ggplot(data = NoBlanks, aes(x = REL_YIELD, y = STDiso, color = GUESS.SAMP))+
-  geom_point()+
-  ylab("STD corrected \u03B418O (\u2030, VSMOW)")+
-  xlab("Yield Relative to STD")+
-  theme_bw()+
-  theme(legend.position="bottom")
+geom_point()+
+ylab("STD corrected \u03B418O (\u2030, VSMOW)")+
+xlab("Yield Relative to STD")+
+theme_bw()+
+theme(legend.position="bottom")
 
 PrimaryBeamTime <- ggplot(data = NoBlanks, aes(x = `DATETIME`, y=`IPnA`))+
-  geom_line()+
-  geom_point(aes(color = GUESS.SAMP))+
-  geom_vline(xintercept = MassCalibTime, colour = "red")+
-  scale_x_datetime()+
-  ylab("IP (nA)")+
-  theme_bw()+
-  theme(legend.position="bottom")
-  
+geom_line()+
+geom_point(aes(color = GUESS.SAMP))+
+geom_vline(xintercept = MassCalibTime, colour = "red")+
+scale_x_datetime()+
+ylab("IP (nA)")+
+theme_bw()+
+theme(legend.position="bottom")
+
 d18OTime <- ggplot(data = NoBlanks, aes(x = `DATETIME`, y=`d18Omeas`))+
-  geom_point(aes(color = MATERIAL))+
-  geom_smooth(data = NoBlanks[NoBlanks$MATERIAL=='STD',], method = 'loess')+
-  geom_vline(xintercept = MassCalibTime, colour = "red")+
-  scale_x_datetime()+
-  ylab("\u03B418O Measured (\u2030)")+
-  theme_bw()+
-  theme(legend.position="bottom")
-  
+geom_point(aes(color = MATERIAL))+
+geom_smooth(data = NoBlanks[NoBlanks$MATERIAL=='STD',], method = 'loess')+
+geom_vline(xintercept = MassCalibTime, colour = "red")+
+scale_x_datetime()+
+ylab("\u03B418O Measured (\u2030)")+
+theme_bw()+
+theme(legend.position="bottom")
+
 YieldTime <- ggplot(data = NoBlanks, aes(x = `DATETIME`, y=`Yield`))+
-  geom_point(aes(color = MATERIAL))+
-  geom_smooth(data = NoBlanks[NoBlanks$MATERIAL=='STD',], method = 'loess')+
-  geom_vline(xintercept = MassCalibTime, colour = "red")+
-  scale_x_datetime()+
-  ylab("Yield (Gcps/nA)")+
-  theme_bw()+
-  theme(legend.position="bottom")
-  
+geom_point(aes(color = MATERIAL))+
+geom_smooth(data = NoBlanks[NoBlanks$MATERIAL=='STD',], method = 'loess')+
+geom_vline(xintercept = MassCalibTime, colour = "red")+
+scale_x_datetime()+
+ylab("Yield (Gcps/nA)")+
+theme_bw()+
+theme(legend.position="bottom")
+
 SEintTime <- ggplot(data = NoBlanks, aes(x = `DATETIME`, y=`SE2int`))+
-  geom_point(aes(color = MATERIAL))+
-  geom_smooth(data = NoBlanks[NoBlanks$MATERIAL=='STD',], method = 'loess')+
-  geom_vline(xintercept = MassCalibTime, colour = "red")+
-  scale_x_datetime()+
-  ylab("Measurement 2*SE (\u2030)")+
-  theme_bw()+
-  theme(legend.position="bottom")
+geom_point(aes(color = MATERIAL))+
+geom_smooth(data = NoBlanks[NoBlanks$MATERIAL=='STD',], method = 'loess')+
+geom_vline(xintercept = MassCalibTime, colour = "red")+
+scale_x_datetime()+
+ylab("Measurement 2*SE (\u2030)")+
+theme_bw()+
+theme(legend.position="bottom")
 
 d18OvsYield <- ggplot(data = NoBlanks, aes(x = `d18Omeas`, y=`Yield`))+
-  geom_point(aes(color = MATERIAL))+
-  xlab("\u03B418O Measured (\u2030)")+
-  theme_bw()+
-  theme(legend.position="bottom")
+geom_point(aes(color = MATERIAL))+
+xlab("\u03B418O Measured (\u2030)")+
+theme_bw()+
+theme(legend.position="bottom")
 
 d18OvsBeam <- ggplot(data = Standards, aes(x=`IPnA`, y=d18Omeas))+
-  geom_point()+
-  xlab("IP (nA)")+
-  ylab("\u03B418O Measured (\u2030)")+
-  theme_bw()+
-  theme(legend.position="bottom")
+geom_point()+
+xlab("IP (nA)")+
+ylab("\u03B418O Measured (\u2030)")+
+theme_bw()+
+theme(legend.position="bottom")
 
 DTFAs <- ggplot(data = NoBlanks, aes(x = DTFAX, y = DTFAY, colour = MATERIAL))+
-  geom_point()+
-  xlab("DTFA-X")+
-  ylab("DTFA-Y")+
-  xlim(-50,50)+
-  ylim(-50,50)+
-  coord_fixed()+
-  theme_bw()+
-  theme(legend.position = "bottom")
-  
+geom_point()+
+xlab("DTFA-X")+
+ylab("DTFA-Y")+
+xlim(-50,50)+
+ylim(-50,50)+
+coord_fixed()+
+theme_bw()+
+theme(legend.position = "bottom")
+
 DTFAs <- ggMarginal(DTFAs, type = "density", margins = "both", fill = "grey")
 
 XDTFAX <- ggplot(data = NoBlanks, aes(x = X, y = DTFAX, colour = MATERIAL))+
-  geom_point()+
-  xlab("X \u03BCm")+
-  ylab("DTFA-X")+
-  theme_bw()+
-  theme(legend.position="bottom")
+geom_point()+
+xlab("X \u03BCm")+
+ylab("DTFA-X")+
+theme_bw()+
+theme(legend.position="bottom")
 
 YDTFAY <- ggplot(data = NoBlanks, aes(x = Y, y = DTFAY, colour = MATERIAL))+
-  geom_point()+
-  xlab("Y \u03BCm")+
-  ylab("DTFA-Y")+
-  theme_bw()+
-  theme(legend.position="bottom")
+geom_point()+
+xlab("Y \u03BCm")+
+ylab("DTFA-Y")+
+theme_bw()+
+theme(legend.position="bottom")
 
 circle <- data.frame(x.0=0,y.0=0,r=8000)
 
 Geometery <- ggplot(data = NoBlanks, aes(x = X, y = Y, colour = MATERIAL))+
-  facet_wrap(~GUESS.SAMP)+
-  geom_point()+
-  geom_circle(data = circle, aes(x0 = x.0, y0 = y.0, r = r), inherit.aes = FALSE)+
-  xlab("X \u03BCm")+
-  ylab("Y \u03BCm")+
-  coord_fixed()+
-  theme_bw()+
-  theme(legend.position="bottom")
+facet_wrap(~GUESS.SAMP)+
+geom_point()+
+geom_circle(data = circle, aes(x0 = x.0, y0 = y.0, r = r), inherit.aes = FALSE)+
+xlab("X \u03BCm")+
+ylab("Y \u03BCm")+
+coord_fixed()+
+theme_bw()+
+theme(legend.position="bottom")
 
 #### Summary statistic calculation for a variety of columns ####
 #### focused on differentiating sample and standard as
@@ -272,7 +272,7 @@ This is an autogenerated session summary Rmarkdown document for analyses on the 
 
 This document provides summary statistics on instrument stability and standard analyses within a $\delta^{18}$O session. This does not provide assessments of data quality for any single analysis.
 
-## Summary for SIMS Session: ``r filename``
+## Summary for SIMS Session: `r filename`
 
 This session lasted **`r SessionTime`** hours with **`r nrow(NoBlanks)`** analyses comprising **`r nrow(Standards)`** standard analyses and **`r nrow(Samples)`** sample analyses.
 
@@ -281,37 +281,47 @@ The included figures and tables summarize standard and sample analyses for the s
 Standard corrected $\delta^{18}$O, OHO, and Relative Yields values shown in these figures are recalculated based on the identification of brackets and includes *all standards* in brackets.
 
 ## Important Summary figures for lab use
+
 \newline
+
 ```{r Fig1, echo=FALSE, warning=FALSE}
 
 Geometery
 
 ```
+
 \newline
-**Figure 1. Spatial distribution of analysis points.** Reference circle is the extent of analyzable area in the large holder mounts [@peres_new_2013]. If using small holder mounts, use a 10 mm circle. Analyses outside of this area are potentially not reliable.
-\newline
+
+**Figure 1. Spatial distribution of analysis points.** Reference circle is the extent of analyzable area in the large holder mounts [@peres_new_2013]. If using small holder mounts, use a 10 mm circle. Analyses outside of this area are potentially not reliable. \newline
+
 ```{r Fig2, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
 
 Standard2SDHist
 
 ```
+
 \newline
-**Figure 2. Histogram of bracket 2SD for all standard brackets** These are from the 'Bracket Average and 2SD' rows in the Excel table. Calculation is based on the repeated analysis of the running standard.
-\newline
+
+**Figure 2. Histogram of bracket 2SD for all standard brackets** These are from the 'Bracket Average and 2SD' rows in the Excel table. Calculation is based on the repeated analysis of the running standard. \newline
+
 ```{r Fig3, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
 
 StandardMeasVio
 
 ```
+
 \newline
-**Figure 3. Histogram of average measured $\delta^{18}O$ in bracket standard lines.** These are from the 'Bracket Average and 2SD' rows in the Excel table.
+
+**Figure 3. Histogram of average measured** $\delta^{18}O$ in bracket standard lines. These are from the 'Bracket Average and 2SD' rows in the Excel table.
 
 ```{r Fig4, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
 
 PrimaryBeamHist
 
 ```
+
 \newline
+
 **Figure 4. Histogram of primary beam stability through all analyses.** These are from all of the IP(nA) entries in the Excel File.
 
 ```{r Fig5, echo=FALSE, fig.height=4, fig.width=6.5, warning=FALSE}
@@ -319,7 +329,9 @@ PrimaryBeamHist
 PrimaryBeamTime
 
 ```
+
 \newline
+
 **Figure 5. Primary beam through time for full session.** These are recorded with each analysis. Red vertical lines are approximate times for mass calibration routine.
 
 ```{r d18OTime, echo=FALSE, fig.height=4, fig.width=6.5, warning=FALSE}
@@ -327,7 +339,9 @@ PrimaryBeamTime
 d18OTime
 
 ```
+
 \newline
+
 **Figure 5. Primary beam through time for full session.**
 
 ```{r YieldTime, echo=FALSE, fig.height=4, fig.width=6.5, warning=FALSE}
@@ -335,7 +349,9 @@ d18OTime
 YieldTime
 
 ```
+
 \newline
+
 **Figure 5. Primary beam through time for full session.**
 
 ```{r SEintTime, echo=FALSE, fig.height=4, fig.width=6.5, warning=FALSE}
@@ -343,7 +359,9 @@ YieldTime
 SEintTime
 
 ```
+
 \newline
+
 **Figure 5. Primary beam through time for full session.**
 
 ```{r OHOd18Ocross, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
@@ -351,7 +369,9 @@ SEintTime
 RelHydd18O
 
 ```
+
 \newline
+
 **Figure 6. Primary beam through time for full session.**
 
 ```{r RelYieldd18Ocross, echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
@@ -359,7 +379,9 @@ RelHydd18O
 RelYieldd18O
 
 ```
+
 \newline
+
 **Figure 6. Primary beam through time for full session.**
 
 ```{r RelYieldOHOcross, echo=FALSE, warning=FALSE}
@@ -367,10 +389,13 @@ RelYieldd18O
 RelYieldHyd
 
 ```
+
 \newline
+
 **Figure 6. Primary beam through time for full session.**
 
 ## Summary tables (user focused)
+
 The tables below are useful for the user to assess their data and mount preparation.
 
 ## Summary figures (lab focused)
@@ -385,9 +410,12 @@ kable(TimeSummary, align = 'llccc')%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
 ```
+
+```{=tex}
 \newpage
 \blandscape
-**Table 2. Session measured $\delta^{18}$O summary** Unstandardized average and range of values.
+```
+**Table 2. Session measured** $\delta^{18}$O summary Unstandardized average and range of values.
 
 ```{r Table 2, echo=FALSE, warning=FALSE, paged.print=TRUE}
 
@@ -395,7 +423,9 @@ kable(Materiald18O)%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
 ```
+
 \elandscape
+
 **Table 3. Session measured Yield summary** Unstandardized average and range of values.
 
 ```{r Table 3, echo=FALSE, warning=FALSE, paged.print=TRUE}
@@ -406,7 +436,7 @@ kable(MaterialYield)%>%
 ```
 
 **Table 4. Session measured OHO summary.**
-  
+
 ```{r Table 4, echo=FALSE, warning=FALSE, paged.print=TRUE}
 
 kable(MaterialHyd)%>%
@@ -415,7 +445,7 @@ kable(MaterialHyd)%>%
 ```
 
 **Table 5. Session DTFA-X.**
-  
+
 ```{r Table 5, echo=FALSE, warning=FALSE, paged.print=TRUE}
 
 kable(MaterialDTFAX)%>%
@@ -424,7 +454,7 @@ kable(MaterialDTFAX)%>%
 ```
 
 **Table 6. Session DTFA-Y.**
-  
+
 ```{r Table 6, echo=FALSE, warning=FALSE, paged.print=TRUE}
 
 kable(MaterialDTFAY)%>%
@@ -432,21 +462,24 @@ kable(MaterialDTFAY)%>%
 
 ```
 
-
 ```{r Fig6, echo=FALSE, fig.height=3.5, fig.width=3.5, warning=FALSE}
 
 d18OvsBeam
 
 ```
+
 \newline
-**Figure 6. Measured $\delta^{18}$O vs primary beam intensity.**
-  
-  ```{r Fig7, echo=FALSE, fig.height=3.5, fig.width=3.5, warning=FALSE}
+
+**Figure 6. Measured** $\delta^{18}$O vs primary beam intensity.
+
+```{r Fig7, echo=FALSE, fig.height=3.5, fig.width=3.5, warning=FALSE}
 
 DTFAs
 
 ```
+
 \newline
+
 **Figure 7. DTFA-X vs DTFA-Y.** These should be within +- 40.
 
 ```{r Fig8, echo=FALSE, fig.height=3.5, fig.width=3.5, warning=FALSE}
@@ -454,13 +487,17 @@ DTFAs
 YDTFAY
 
 ```
+
 \newline
-**Figure 8. Distance in Y $\mu$m vs DTFA-Y value.**
-  
+
+**Figure 8. Distance in Y** $\mu$m vs DTFA-Y value.
+
 ```{r Fig9, echo=FALSE, fig.height=3.5, fig.width=3.5, warning=FALSE}
 
 XDTFAX
 
 ```
+
 \newline
-**Figure 9. Distance in X $\mu$m vs DTFA-X value.**
+
+**Figure 9. Distance in X** $\mu$m vs DTFA-X value.

@@ -12,6 +12,7 @@ StandardID <- function(InputFile, IsotopeMethod){
   Output <- InputFile
   
   Output$RegexSTD <- Output$Comment
+  Output$is_standard <- Output$Comment
   
   url1 <-
     "https://github.com/EarthCubeGeochron/Sparrow-WiscSIMS/blob/master/Test-Data/WiscSIMSrunSTDS.xlsx?raw=true"
@@ -23,7 +24,17 @@ StandardID <- function(InputFile, IsotopeMethod){
     
   Output$RegexSTD[grepl(Standards$REGEX[i], Output$Comment, ignore.case = TRUE)] <- Standards$StdName[i]
   
+  Output$is_standard[grepl(Standards$REGEX[i], Output$Comment, ignore.case = TRUE)] <- TRUE
+  
   }
+  
+  Output$is_standard[is.na(Output$File)] <- NA
+  
+  Output$is_standard[!is.na(Output$SD2ext)&!is.na(Output$DTFAX)]<- NA
+  
+  Output$RegexSTD[is.na(Output$is_standard)] <- NA
+  
+  Output$is_standard[!is.na(Output$SD2ext)&!is.na(Output$DTFAX)]<- FALSE
   
   return(Output)
   
