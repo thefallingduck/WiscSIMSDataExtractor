@@ -26,8 +26,6 @@ BracketRecalc <- function(InputFile, IsotopeMethod){
   Output$BRACKET2SD <- NA
   Output$STDiso <- NA
   
-  Output <- StandardID(Output, IsotopeMethod = IsotopeMethod)
-  
   url1 <-
     "https://github.com/EarthCubeGeochron/Sparrow-WiscSIMS/blob/master/Test-Data/WiscSIMSrunSTDS.xlsx?raw=true"
   GET(url1, write_disk(tf <- tempfile(fileext = ".xlsx")))
@@ -50,8 +48,7 @@ BracketRecalc <- function(InputFile, IsotopeMethod){
   }
   
   #### Bracket level recalculation of standard, hydride, and yield####
-  #tryCatch(
-   # {
+
       for(i in 1:length(Samples)){
         
         StartGroup <- AllGroups[match(Samples[i],AllGroups)-1]
@@ -70,9 +67,7 @@ BracketRecalc <- function(InputFile, IsotopeMethod){
         
         if (length(Output$BRACKET2SD[ReplaceLogic])>=1 && length(Output$BRACKET2SD[SelectLogic])>=1){
           
-          RunStd <- as.numeric(Standards[Standards$StdName==unique(Output$RegexSTD[SelectLogic]), Isotope])
-          
-          Output$GUESS.SAMP[SelectLogic] <- unique(Output$GUESS.SAMP[ReplaceLogic])
+          RunStd <- as.numeric(Standards[Standards$StdName==unique(Output$RegexSTD[SelectLogic])[1], Isotope])
           
           Output$BRACKET2SD[ReplaceLogic] <- 2*sd(Output[SelectLogic, 7])
           
@@ -86,10 +81,6 @@ BracketRecalc <- function(InputFile, IsotopeMethod){
           Output$REL_Hyd[ReplaceLogic] <- Output[ReplaceLogic, 19]-mean(Output[SelectLogic, 19], na.rm=TRUE)}
         
       }
-    #},
-   # warning=function(cond){
-   #   message(paste("Bracket Calculation failed"))
-   # }
-  #)
+
   return(Output)
 }

@@ -76,9 +76,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   warning=function(cond) {
     message("Error on ColumnRename")
     message("Here's the original warning message:")
-    print("\n")
     message(cond)
-    print("\n")
     # Choose a return value in case of warning
     return(NULL)
   })
@@ -89,26 +87,50 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
     Output <- AddBracketStructure(Output)
     Output
     },
+    error=function(cond) {
+      message("Error on AddBracketStructure.")
+      message("Here's the original error message:")
+      message(cond)
+      return(Output)
+    },
                      warning=function(cond) {
-                       message("Error on AddBracketStructure")
+                       message("Warning on AddBracketStructure")
                        message("Here's the original warning message:")
-                       print("\n")
                        message(cond)
-                       print("\n")
                        # Choose a return value in case of warning
-                       return(NULL)
+                       return(Output)
+                     })
+  
+  Output <- tryCatch({Output <- StandardID(Output, IsotopeMethod = IsotopeMethod)},
+                     error=function(cond) {
+                       message("Error on StandardID.")
+                       message("Here's the original error message:")
+                       message(cond)
+                       return(Output)
+                     },
+                     warning=function(cond) {
+                       message("Warning on StandardID")
+                       message("Here's the original warning message:")
+                       message(cond)
+                       # Choose a return value in case of warning
+                       return(Output)
                      })
   
   Output <- tryCatch({
     Output <- BracketRecalc(Output, IsotopeMethod = IsotopeMethod)
+    
     Output
     },
+    error=function(cond) {
+      message("Error on BracketRecalc.")
+      message("Here's the original error message:")
+      message(cond)
+      return(Output)
+    },
                      warning=function(cond) {
-                       message("Error on BracketRecalc")
+                       message("Warning on BracketRecalc")
                        message("Here's the original warning message:")
-                       print("\n")
                        message(cond)
-                       print("\n")
                        # Choose a return value in case of warning
                        return(Output)
                      })
@@ -119,7 +141,7 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   },
   error=function(cond) {
     message("Error on CatchExcelBrackets.")
-    message("Here's the original warning message:")
+    message("Here's the original error message:")
     message(cond)
     return(Output)
   },

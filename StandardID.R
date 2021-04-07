@@ -10,7 +10,6 @@ StandardID <- function(InputFile, IsotopeMethod){
   #       Output: Dataframe with standard column including simplified standard names
 
   Output <- InputFile
-  
   Output$RegexSTD <- Output$Comment
   Output$is_standard <- Output$Comment
   
