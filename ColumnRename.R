@@ -39,7 +39,7 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
     ))
   
   SmallLookUp <-
-    LookupDF[grep(IsotopeMethod, LookupDF$SIMSmethods),]
+    LookupDF[grep(IsotopeMethod, LookupDF$SIMSmethods), ]
   
   StandardColNames <- vector(length = length(ColumnNames))
   
@@ -61,27 +61,32 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   MissingColumns <-
     UniformColumns[!UniformColumns %in% StandardColNames]
   
-  MissingRequired <- MissingColumns[!MissingColumns %in% RequiredColumns]
-
-  StandardColNames <- tryCatch(expr = {
-    1 + MissingRequired
-    
-    StandardColNames
-  },  error = function(cond){          # Specifying error message
-    message("Missing Required Columns.")
-    message(paste(MissingRequired, " are missing."))
-    return(StandardColNames)
-  },
-                               warning=function(cond) {
-                                 message("Missing Required Columns")
-                                 print(MissingRequired)
-                                 message("Here's the original warning message:")
-                                 print("\n")
-                                 message(cond)
-                                 print("\n")
-                                 # Choose a return value in case of warning
-                                 return(StandardColNames)
-                               })
+  MissingRequired <-
+    MissingColumns[!MissingColumns %in% RequiredColumns]
+  
+  StandardColNames <- tryCatch(
+    expr = {
+      1 + MissingRequired
+      
+      StandardColNames
+    },
+    error = function(cond) {
+      # Specifying error message
+      message("Missing Required Columns.")
+      message(paste(MissingRequired, " are missing."))
+      return(StandardColNames)
+    },
+    warning = function(cond) {
+      message("Missing Required Columns")
+      print(MissingRequired)
+      message("Here's the original warning message:")
+      print("\n")
+      message(cond)
+      print("\n")
+      # Choose a return value in case of warning
+      return(StandardColNames)
+    }
+  )
   
   colnames(InputFile) <- StandardColNames
   
@@ -94,7 +99,7 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   DATETIME[DATETIME == "NA NA"] <- NA
   InputFile$DATETIME <- as.POSIXct(DATETIME)
   Times$Time <- as.POSIXct(DATETIME)
-  Times2 <- Times[is.na(Times$Time) == FALSE, ]
+  Times2 <- Times[is.na(Times$Time) == FALSE,]
   Times2$AnalysisLength <-
     c(NA, difftime(Times2$Time[-1], Times2$Time[-length(Times2$Time)], units = "mins"))
   
@@ -109,8 +114,8 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
     )
   
   InputFile <-
-    InputFile[, !(colnames(InputFile) %in% c("Date.y", "Time.y"))]
-  InputFile <- InputFile[sort(InputFile$INDEX), ]
+    InputFile[,!(colnames(InputFile) %in% c("Date.y", "Time.y"))]
+  InputFile <- InputFile[sort(InputFile$INDEX),]
   
   return(InputFile)
   

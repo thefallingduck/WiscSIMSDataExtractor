@@ -64,7 +64,7 @@ AddBracketStructure <- function(Input) {
       range(RunIndex$start[MountChangeIndex[i]]:RunIndex$end[MountChangeIndex[i +
                                                                                 1]])
     SelectRange <- SelectRange[1]:SelectRange[2]
-    OutputSub <- Output[SelectRange,]
+    OutputSub <- Output[SelectRange, ]
     MountSubset <- OutputSub$Comment[OutputSub$MATERIAL == "Sample"]
     MountSubset <- MountSubset[!is.na(MountSubset)]
     if (length(MountSubset) > 0) {
