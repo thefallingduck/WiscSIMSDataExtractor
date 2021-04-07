@@ -60,8 +60,6 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   
   Input <- as.data.frame(read_excel(InputFile, guess_max = 1000, range = cell_cols("A:Z")))
   
-  print(colnames(Input))
-  
   source("ColumnRename.R")
   source("StandardID.R")
   source("MaxStringRepeated.R")
@@ -78,7 +76,9 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
   warning=function(cond) {
     message("Error on ColumnRename")
     message("Here's the original warning message:")
+    print("\n")
     message(cond)
+    print("\n")
     # Choose a return value in case of warning
     return(NULL)
   })
@@ -92,7 +92,9 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
                      warning=function(cond) {
                        message("Error on AddBracketStructure")
                        message("Here's the original warning message:")
+                       print("\n")
                        message(cond)
+                       print("\n")
                        # Choose a return value in case of warning
                        return(NULL)
                      })
@@ -104,21 +106,29 @@ GeneralSIMSImporter <- function(InputFile, PlugNum=NA){
                      warning=function(cond) {
                        message("Error on BracketRecalc")
                        message("Here's the original warning message:")
+                       print("\n")
                        message(cond)
+                       print("\n")
                        # Choose a return value in case of warning
-                       return(NULL)
+                       return(Output)
                      })
   
   Output <- tryCatch({
     Output <- CatchExcelBrackets(Output)
     Output
   },
+  error=function(cond) {
+    message("Error on CatchExcelBrackets.")
+    message("Here's the original warning message:")
+    message(cond)
+    return(Output)
+  },
   warning=function(cond) {
-    message("Error on CatchExcelBrackets")
+    message("Warning on CatchExcelBrackets")
     message("Here's the original warning message:")
     message(cond)
     # Choose a return value in case of warning
-    return(NULL)
+    return(Output)
   })
   
   Output <- Output[order(Output$INDEX),]

@@ -53,6 +53,7 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   }
   
   UniformColumns <- SmallLookUp$ColNames
+  RequiredColumns <- SmallLookUp$ColNames[SmallLookUp$REQUIRED]
   
   ExtraColumns <-
     ColumnNames[!StandardColNames %in% UniformColumns]
@@ -60,15 +61,28 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   MissingColumns <-
     UniformColumns[!UniformColumns %in% StandardColNames]
   
+  MissingRequired <- MissingColumns[!MissingColumns %in% RequiredColumns]
   
-  tryCatch({
-    if (length(MissingColumns) > 0) {
-      warning(paste("Missing:", toString(MissingColumns)))
-    }
-  })
-  # }, error = function(e) {
-  #   cat("ERROR :", conditionMessage(e), "\n")
-  # })
+
+  StandardColNames <- tryCatch(expr = {
+    1 + MissingRequired
+    
+    StandardColNames
+  },  error = function(cond){          # Specifying error message
+    message("Missing Required Columns.")
+    message(paste(MissingRequired, " are missing."))
+    return(StandardColNames)
+  },
+                               warning=function(cond) {
+                                 message("Missing Required Columns")
+                                 print(MissingRequired)
+                                 message("Here's the original warning message:")
+                                 print("\n")
+                                 message(cond)
+                                 print("\n")
+                                 # Choose a return value in case of warning
+                                 return(StandardColNames)
+                               })
   
   colnames(InputFile) <- StandardColNames
   
@@ -103,3 +117,23 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   
   
 }
+
+tryCatch(                       # Applying tryCatch
+  
+  expr = {                      # Specifying expression
+    1 + MissingRequired
+    message("Everything was fine.")
+  },
+  
+  error = function(e){          # Specifying error message
+    message("There was an error message.")
+  },
+  
+  warning = function(w){        # Specifying warning message
+    message("There was a warning message.")
+  },
+  
+  finally = {                   # Specifying final message
+    message("tryCatch is finished.")
+  }
+)

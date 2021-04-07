@@ -8,7 +8,7 @@
 #' @examples
 MaxStringRepeated <- function(Input) {
   Input <- Input[!is.na(Input)]
-  Shortest <- Input[max(which(nchar(Input) == min(nchar(Input))))]
+  Shortest <- Input[min(which(nchar(Input) == max(nchar(Input))))]
   ShortestChar <- nchar(Shortest)
   i <- 2
   Test <- TRUE
