@@ -116,23 +116,33 @@ DatumNesting <- function(InputFile,
       }
       
       if (SmallTable$MATERIAL[j] == "STD") {
-        standard_name <- SmallTable$RegexSTD[j]
+        
+        analysis[[j]] <- list(
+          analysis_name = SmallTable$File[j],
+          analysis_type = IsotopeMethod,
+          date = gsub(" ", "T", SmallTable$DATETIME[j]),
+          is_standard = SmallTable$MATERIAL[j] == "STD",
+          datum = DatumList,
+          attribute = AttributeList,
+          material = SmallTable$MATERIAL[j],
+          session_index = j,
+          standard_sample = list(name = SmallTable$RegexSTD[j])
+        )
         
       } else{
-        standard_name <- NULL
+        
+        analysis[[j]] <- list(
+          analysis_name = SmallTable$File[j],
+          analysis_type = IsotopeMethod,
+          date = gsub(" ", "T", SmallTable$DATETIME[j]),
+          is_standard = SmallTable$MATERIAL[j] == "STD",
+          datum = DatumList,
+          attribute = AttributeList,
+          material = SmallTable$MATERIAL[j],
+          session_index = j
+        )
         
       }
-      analysis[[j]] <- list(
-        analysis_name = SmallTable$File[j],
-        analysis_type = IsotopeMethod,
-        date = gsub(" ", "T", SmallTable$DATETIME[j]),
-        is_standard = SmallTable$MATERIAL[j] == "STD",
-        datum = DatumList,
-        attribute = AttributeList,
-        material = SmallTable$MATERIAL[j],
-        session_index = j,
-        standard_sample = standard_name
-      )
       #print(j)
       #print(nrow(SmallTable))
       
