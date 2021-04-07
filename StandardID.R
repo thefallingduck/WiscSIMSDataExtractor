@@ -1,5 +1,4 @@
-StandardID <- function(InputFile, IsotopeMethod){
-  
+StandardID <- function(InputFile, IsotopeMethod) {
   #Identifies running standards based on GREP library
   
   #Args:
@@ -8,7 +7,7 @@ StandardID <- function(InputFile, IsotopeMethod){
   
   #Returns:
   #       Output: Dataframe with standard column including simplified standard names
-
+  
   Output <- InputFile
   Output$RegexSTD <- Output$Comment
   Output$is_standard <- Output$Comment
@@ -18,22 +17,25 @@ StandardID <- function(InputFile, IsotopeMethod){
   GET(url1, write_disk(tf <- tempfile(fileext = ".xlsx")))
   
   Standards <- read_excel(tf)
-
-  for(i in 1:nrow(Standards)){
+  
+  for (i in 1:nrow(Standards)) {
+    Output$RegexSTD[grepl(Standards$REGEX[i], Output$Comment, ignore.case = TRUE)] <-
+      Standards$StdName[i]
     
-  Output$RegexSTD[grepl(Standards$REGEX[i], Output$Comment, ignore.case = TRUE)] <- Standards$StdName[i]
-  
-  Output$is_standard[grepl(Standards$REGEX[i], Output$Comment, ignore.case = TRUE)] <- TRUE
-  
+    Output$is_standard[grepl(Standards$REGEX[i], Output$Comment, ignore.case = TRUE)] <-
+      TRUE
+    
   }
   
   Output$is_standard[is.na(Output$File)] <- NA
   
-  Output$is_standard[!is.na(Output$SD2ext)&!is.na(Output$DTFAX)]<- NA
+  Output$is_standard[!is.na(Output$SD2ext) &
+                       !is.na(Output$DTFAX)] <- NA
   
   Output$RegexSTD[is.na(Output$is_standard)] <- NA
   
-  Output$is_standard[!is.na(Output$SD2ext)&!is.na(Output$DTFAX)]<- FALSE
+  Output$is_standard[!is.na(Output$SD2ext) &
+                       !is.na(Output$DTFAX)] <- FALSE
   
   return(Output)
   
