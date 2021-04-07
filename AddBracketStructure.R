@@ -1,5 +1,5 @@
 AddBracketStructure <- function(Input) {
- # Input <- Output # for debugging?
+  #Input <- Output # for debugging?
   
   #This material regex string could be modified based on dictionary?
   MaterialRegex <- "UW|-WI|KIM|SC"
@@ -43,9 +43,6 @@ AddBracketStructure <- function(Input) {
   
   Output$GROUPNUM <- GROUPNUM
   
-  #### Add GROUPNUM to output dataframe
-  
-  Output$GROUPNUM <- GROUPNUM
   #### Guess at sample names using comment strings ####
   GUESS.SAMP <- vector(length = length(Material))
   

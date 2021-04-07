@@ -62,7 +62,6 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
     UniformColumns[!UniformColumns %in% StandardColNames]
   
   MissingRequired <- MissingColumns[!MissingColumns %in% RequiredColumns]
-  
 
   StandardColNames <- tryCatch(expr = {
     1 + MissingRequired
@@ -117,23 +116,3 @@ ColumnRename <- function(InputFile, IsotopeMethod) {
   
   
 }
-
-tryCatch(                       # Applying tryCatch
-  
-  expr = {                      # Specifying expression
-    1 + MissingRequired
-    message("Everything was fine.")
-  },
-  
-  error = function(e){          # Specifying error message
-    message("There was an error message.")
-  },
-  
-  warning = function(w){        # Specifying warning message
-    message("There was a warning message.")
-  },
-  
-  finally = {                   # Specifying final message
-    message("tryCatch is finished.")
-  }
-)
