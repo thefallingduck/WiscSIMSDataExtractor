@@ -117,39 +117,68 @@ DatumNesting <- function(InputFile,
       
       d <- try(as.Date(SmallTable$DATETIME[i], format="%Y-%m-%d %H:%M:%S"))
       if("try-error" %in% class(d) || is.na(d)) {
-        date <- NULL
+
+        if (SmallTable$MATERIAL[j] == "STD") {
+          
+          analysis[[j]] <- list(
+            analysis_name = SmallTable$Comment[j],
+            analysis_type = IsotopeMethod,
+            is_standard = SmallTable$MATERIAL[j] == "STD",
+            datum = DatumList,
+            attribute = AttributeList,
+            material = SmallTable$MATERIAL[j],
+            session_index = j,
+            standard_sample = list(name = SmallTable$RegexSTD[j])
+          )
+          
+        } else{
+          
+          analysis[[j]] <- list(
+            analysis_name = SmallTable$Comment[j],
+            analysis_type = IsotopeMethod,
+            is_standard = SmallTable$MATERIAL[j] == "STD",
+            datum = DatumList,
+            attribute = AttributeList,
+            material = SmallTable$MATERIAL[j],
+            session_index = j
+          )
+          
+        }
+        
       } else {
+        
         date <- gsub(" ", "T", SmallTable$DATETIME[j])
+        
+        if (SmallTable$MATERIAL[j] == "STD") {
+          
+          analysis[[j]] <- list(
+            analysis_name = SmallTable$Comment[j],
+            analysis_type = IsotopeMethod,
+            date = date,
+            is_standard = SmallTable$MATERIAL[j] == "STD",
+            datum = DatumList,
+            attribute = AttributeList,
+            material = SmallTable$MATERIAL[j],
+            session_index = j,
+            standard_sample = list(name = SmallTable$RegexSTD[j])
+          )
+          
+        } else{
+          
+          analysis[[j]] <- list(
+            analysis_name = SmallTable$Comment[j],
+            analysis_type = IsotopeMethod,
+            date = date,
+            is_standard = SmallTable$MATERIAL[j] == "STD",
+            datum = DatumList,
+            attribute = AttributeList,
+            material = SmallTable$MATERIAL[j],
+            session_index = j
+          )
+          
+        }
       }
       
-      if (SmallTable$MATERIAL[j] == "STD") {
-        
-        analysis[[j]] <- list(
-          analysis_name = SmallTable$File[j],
-          analysis_type = IsotopeMethod,
-          date = date,
-          is_standard = SmallTable$MATERIAL[j] == "STD",
-          datum = DatumList,
-          attribute = AttributeList,
-          material = SmallTable$MATERIAL[j],
-          session_index = j,
-          standard_sample = list(name = SmallTable$RegexSTD[j])
-        )
-        
-      } else{
-        
-        analysis[[j]] <- list(
-          analysis_name = SmallTable$File[j],
-          analysis_type = IsotopeMethod,
-          date = date,
-          is_standard = SmallTable$MATERIAL[j] == "STD",
-          datum = DatumList,
-          attribute = AttributeList,
-          material = SmallTable$MATERIAL[j],
-          session_index = j
-        )
-        
-      }
       #print(j)
       #print(nrow(SmallTable))
       
