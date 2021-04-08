@@ -115,12 +115,19 @@ DatumNesting <- function(InputFile,
         #print(m)
       }
       
+      d <- try(as.Date(SmallTable$DATETIME[i], format="%Y-%m-%d %H:%M:%S"))
+      if("try-error" %in% class(d) || is.na(d)) {
+        date <- NULL
+      } else {
+        date <- gsub(" ", "T", SmallTable$DATETIME[j])
+      }
+      
       if (SmallTable$MATERIAL[j] == "STD") {
         
         analysis[[j]] <- list(
           analysis_name = SmallTable$File[j],
           analysis_type = IsotopeMethod,
-          date = gsub(" ", "T", SmallTable$DATETIME[j]),
+          date = date,
           is_standard = SmallTable$MATERIAL[j] == "STD",
           datum = DatumList,
           attribute = AttributeList,
@@ -134,7 +141,7 @@ DatumNesting <- function(InputFile,
         analysis[[j]] <- list(
           analysis_name = SmallTable$File[j],
           analysis_type = IsotopeMethod,
-          date = gsub(" ", "T", SmallTable$DATETIME[j]),
+          date = date,
           is_standard = SmallTable$MATERIAL[j] == "STD",
           datum = DatumList,
           attribute = AttributeList,
