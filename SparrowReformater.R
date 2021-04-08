@@ -125,7 +125,7 @@ DatumNesting <- function(InputFile,
       if (SmallTable$MATERIAL[j] == "STD") {
         
         analysis[[j]] <- list(
-          analysis_name = SmallTable$File[j],
+          analysis_name = SmallTable$Comment[j],
           analysis_type = IsotopeMethod,
           date = date,
           is_standard = SmallTable$MATERIAL[j] == "STD",
@@ -139,7 +139,7 @@ DatumNesting <- function(InputFile,
       } else{
         
         analysis[[j]] <- list(
-          analysis_name = SmallTable$File[j],
+          analysis_name = SmallTable$Comment[j],
           analysis_type = IsotopeMethod,
           date = date,
           is_standard = SmallTable$MATERIAL[j] == "STD",
