@@ -1,3 +1,15 @@
+#' Create uniform column names that are machine readable.
+#' @name ColumnRename
+#' 
+#' Renames the columns in a WiscSIMS excel file to create uniform column names.
+#' 
+#' @param InputFile is a dataframe from a WiscSIMS excel file.
+#' @param IsotopeMethod is an identified isotope method from the excel filename.
+#'
+#' @return 
+#' @export
+#'
+#' @examples
 ColumnRename <- function(InputFile, IsotopeMethod) {
   ####Function to rename SIMS file columns using a lookup table that
   #is currently manually generated, but could eventually use something from Sparrow API?

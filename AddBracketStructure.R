@@ -1,3 +1,14 @@
+#' Add brackets and mount names to SIMS dataframe
+#' 
+#' \code{AddBracketStructure} creates \code{MATERIAL}, \code{GROUPNUM}, and \code{GUESS.SAMP} columns on input dataframe based primarily on the \code{Comment}, \code{DTFAX}, \code{File}, and \code{SD2ext} columns from the original dataframe.
+#'
+#' @param Input dataframe with at least \code{File},\code{Comment},\code{DTFAX},\code{SD2ext}, and \code{AnalysisLength} columns.\code{}\code{}
+#'
+#' @return Dataframe with columns for brackets appended.
+#' @export
+#'
+#' @examples Add a fake dataframe?
+#' 
 AddBracketStructure <- function(Input) {
   #Input <- Output # for debugging?
   
