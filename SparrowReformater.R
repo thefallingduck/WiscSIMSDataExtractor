@@ -1,3 +1,20 @@
+#' Sparrow JSON creation
+#'
+#' Takes a WiscSIMS excel sheet and potentially the number of mounts and
+#' makes a JSON following the [Sparrow](https://sparrow-data.org/) schema.
+#' This can be uploaded if running in local instance of Sparrow
+#' using a put request, or is made as a JSON and stored.
+#'
+#' Could be made better by allowing JSON locations to be chosen.
+#'
+#' @param InputFile A SIMS excel sheet with necessary column names.
+#' @param PlugNum
+#' @param Upload
+#'
+#' @return
+#' @export
+#'
+#' @examples
 DatumNesting <- function(InputFile,
                          PlugNum = NA,
                          Upload = TRUE) {
@@ -24,10 +41,10 @@ DatumNesting <- function(InputFile,
   
   Output <-
     GeneralSIMSImporter(InputFile = InputFile, PlugNum = PlugNum)
-  Output <- Output[!is.na(Output$File), ]
+  Output <- Output[!is.na(Output$File),]
   Output$GUESS.SAMP <- as.factor(Output$GUESS.SAMP)
   Output$GUESS.SAMP <- droplevels(Output$GUESS.SAMP)
-  Output <- Output[!is.na(Output$File)&!is.na(Output$DTFAX),]
+  Output <- Output[!is.na(Output$File) & !is.na(Output$DTFAX), ]
   
   print(colnames(Output))
   
@@ -60,7 +77,7 @@ DatumNesting <- function(InputFile,
     SampleList <- list()
     print(levels(Output$GUESS.SAMP)[k])
     SmallTable <-
-      Output[Output$GUESS.SAMP == levels(Output$GUESS.SAMP)[k], ]
+      Output[Output$GUESS.SAMP == levels(Output$GUESS.SAMP)[k],]
     #print(SmallTable$GUESS.SAMP)
     Session <- list()
     request <- list()
@@ -78,7 +95,8 @@ DatumNesting <- function(InputFile,
       for (i in 1:ncol(SmallTable)) {
         if (LookupDF$Type[LookupDF$ColNames == colnames(SmallTable)[i]] == "Numeric") {
           #print(c(l,i))
-          if (!is.na(SmallTable[j, i]) & is.numeric(SmallTable[j, i])) {
+          if (!is.na(SmallTable[j, i]) &
+              is.numeric(SmallTable[j, i])) {
             value <- SmallTable[j, i]
           } else{
             value <- -1042
@@ -115,11 +133,10 @@ DatumNesting <- function(InputFile,
         #print(m)
       }
       
-      d <- try(as.Date(SmallTable$DATETIME[i], format="%Y-%m-%d %H:%M:%S"))
-      if("try-error" %in% class(d) || is.na(d)) {
-
+      d <-
+        try(as.Date(SmallTable$DATETIME[i], format = "%Y-%m-%d %H:%M:%S"))
+      if ("try-error" %in% class(d) || is.na(d)) {
         if (SmallTable$MATERIAL[j] == "STD") {
-          
           analysis[[j]] <- list(
             analysis_name = SmallTable$Comment[j],
             analysis_type = IsotopeMethod,
@@ -132,7 +149,6 @@ DatumNesting <- function(InputFile,
           )
           
         } else{
-          
           analysis[[j]] <- list(
             analysis_name = SmallTable$Comment[j],
             analysis_type = IsotopeMethod,
@@ -146,11 +162,9 @@ DatumNesting <- function(InputFile,
         }
         
       } else {
-        
         date <- gsub(" ", "T", SmallTable$DATETIME[j])
         
         if (SmallTable$MATERIAL[j] == "STD") {
-          
           analysis[[j]] <- list(
             analysis_name = SmallTable$Comment[j],
             analysis_type = IsotopeMethod,
@@ -164,7 +178,6 @@ DatumNesting <- function(InputFile,
           )
           
         } else{
-          
           analysis[[j]] <- list(
             analysis_name = SmallTable$Comment[j],
             analysis_type = IsotopeMethod,

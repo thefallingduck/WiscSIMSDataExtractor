@@ -20,6 +20,9 @@
 #' 
 #' Block_ID(df)
 #' }
+#' @seealso 
+#' [AddBracketStructure()]
+#' 
 Block_ID <- function(Input) {
   output <- Input
   material <- Output$MATERIAL

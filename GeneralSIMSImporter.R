@@ -1,3 +1,21 @@
+#' Standardize all SIMS datasheets
+#'
+#' This function takes a
+#' [WiscSIMS laboratory](http://www.geology.wisc.edu/~wiscsims/index.html)
+#' excel file and standardizes column names using a lookup table.
+#' Mount names and running standards are identified and running
+#' standard corrected isotope ratios are recalculated. Error messages
+#' have been added to allow for easier identification of the reasons
+#' for certain sheets failing.
+#'
+#' @param InputFile
+#' @param PlugNum
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' @seealso \code{\link{BlockID}}
 GeneralSIMSImporter <- function(InputFile, PlugNum = NA) {
   ####Opens up WiscSIMS datafiles that contain d18O or d13C in the
   #file name and parses it to a data table with the same column names

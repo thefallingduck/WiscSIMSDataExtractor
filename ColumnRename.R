@@ -6,7 +6,7 @@
 #' @param InputFile is a dataframe from a WiscSIMS excel file.
 #' @param IsotopeMethod is an identified isotope method from the excel filename.
 #'
-#' @return 
+#' @return Returns a dataframe with uniform column names for a SIMS method.
 #' @export
 #'
 #' @examples
