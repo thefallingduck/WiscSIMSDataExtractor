@@ -18,6 +18,9 @@ Package for extracting data from [WiscSIMS laboratory](http://www.geology.wisc.e
 
 ## Improvements to make...
 
--   [ ] Make `BracketRecalculate()` a stand alone function
--   [ ] Make `MountID()` a stand alone function
+-   [x] Make `BracketRecalculate()` a stand alone function
+-   [x] Make `MountID()` a stand alone function
 -   [ ] Make `SessionSummary()` markdown document a stand alone function
+-   [ ] Make lookup tables as dataframes within the package.
+-   [ ] Add more documentation and finish packaging the functions.
+-   [ ] Refine error handling and reporting.
