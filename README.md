@@ -2,6 +2,12 @@
 
 Package for extracting data from [WiscSIMS laboratory](http://www.geology.wisc.edu/~wiscsims/index.html) archival excel files and reformatting it for import into the [Sparrow data system](https://sparrow-data.org/).
 
+### Funding support
+
+# Sparrow
+[![NSF-1740694](https://img.shields.io/badge/NSF-1740694-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1740694)
+# WiscSIMS
+
 ## Current functions
 
 1.  `ColumnRename()`
